@@ -21,6 +21,10 @@ git config --global user.email "<useremail>"
 git config --global user.name "<username>"
 ```
 
+### Additional customization for bash
+
+https://l-yohai.github.io/VSCode-Terminal-Customizing/#more
+
 ### empty trash bins
 
 ```bash
