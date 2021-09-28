@@ -1,0 +1,126 @@
+{
+    // font and tab settings
+    "editor.fontSize": 16,
+    "editor.tabSize": 4,
+  ​
+    // python settings
+    "python.defaultInterpreterPath": "/opt/conda/bin/python",
+    "python.languageServer": "Pylance",
+  ​
+    // default formatting settings
+    "editor.defaultFormatter": "esbenp.prettier-vscode", // Download prettier from extension tab of VSCode. default formattor is then set as prettier.
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.python" // pytthon default formattor is black
+    },
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+  ​
+    // python formattor settings
+    "python.formatting.provider": "black", // you should pip install black to the corresponding python environment first!
+    "python.formatting.blackPath": "/opt/conda/bin/black",
+    "python.formatting.blackArgs": ["--line-length", "100"],
+  ​
+    // exclude files on the search result: saving editor app's memory
+    "files.watcherExclude": {
+      // ignore resource forks
+      "**/._*":true,
+      
+      // ignore default folders provided by upstage
+      ".viminfo":true,
+      "**/.cache/**": true,
+      ".config": true,
+      "**/.ipynb_checkpoints/**": true,
+      ".ipython/**": true,
+      "**/.jupyter/**": true,
+      ".local/**": true,
+      ".nv/**": true,
+      ".vscode-server/**": true,
+      "**/input/**": true, // ignoring image dataset folder directory
+  ​
+      // ignore default files provided by upstage
+      ".bash_history": true,
+      ".bashrc": true,
+      ".profile": true,
+      ".wget-hsts": true,
+  ​
+      // files to exclude
+      ".wakatime*":true,
+      "**/.DS_Store": true,
+      "**/.git": true,
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/node_modules": true
+    },
+  ​
+    // hide files & directories from the sidebar for better look
+    "files.exclude": {
+      // ignore resource forks
+      "**/._*":true,
+      
+      // ignore default folders provided by upstage
+      ".viminfo":true,
+      "**/.cache/**": true,
+      ".config": true,
+      "**/.ipynb_checkpoints/**": true,
+      ".ipython/**": true,
+      "**/.jupyter/**": true,
+      ".local/**": true,
+      ".nv/**": true,
+      ".vscode-server/**": true,
+      "**/input/**": true, // ignoring image dataset folder directory
+  ​
+      // ignore default files provided by upstage
+      ".bash_history": true,
+      ".bashrc": true,
+      ".profile": true,
+      ".wget-hsts": true,
+  ​
+      // files to exclude
+      ".wakatime*":true,
+      "**/.DS_Store": true,
+      "**/.git": true,
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/node_modules": true
+    },
+  ​
+    "search.exclude": {
+      // ignore resource forks
+      "**/._*":true,
+      
+      // ignore default folders provided by upstage
+      ".viminfo":true,
+      "**/.cache/**": true,
+      ".config": true,
+      "**/.ipynb_checkpoints/**": true,
+      ".ipython/**": true,
+      "**/.jupyter/**": true,
+      ".local/**": true,
+      ".nv/**": true,
+      ".vscode-server/**": true,
+      "**/input/**": true, // ignoring image dataset folder directory
+  ​
+      // ignore default files provided by upstage
+      ".bash_history": true,
+      ".bashrc": true,
+      ".profile": true,
+      ".wget-hsts": true,
+  ​
+      // files to exclude
+      ".wakatime*":true,
+      "**/.DS_Store": true,
+      "**/.git": true,
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/node_modules": true
+    },
+  ​
+    // other settings
+    "workbench.list.openMode": "doubleClick",
+    "terminal.integrated.inheritEnv": false,
+    "terminal.integrated.localEchoStyle": null
+}
+  
