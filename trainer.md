@@ -178,6 +178,8 @@ for train_index, valid_index in stratified_kfold.split(df_train, df_train['label
     - HuggingFace의 Trainer를 사용할 경우, 최종 Average score를 어떻게 출력해야하는지 모름.
     - end-to-end로 inference까지 진행된다. 최종 output만 결과 추출
         - 안좋다! -> 중간에 저장하는 것도 중요하고, 분업도 힘듬 -> Seconde Try 진행
+- /# of fold : 5 / epoch : 1 / 
+- Micro_f1_score : 62.046 / Auprc : 68.871 
 
 - train
 ```python
@@ -348,4 +350,126 @@ output_prob = oof_pred.tolist()
 
 output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
 output.to_csv('./prediction/submission.csv', index=False) # 최종적으로 완성된 
+```
+
+#### Stratified-KFold Second Try (with Inference)
+- HuggingFace Trainer를 사용하여 model 저장한 후 불러서 inference하는 방식
+- train -> model_save -> model_load -> inference
+- batch_size : 32 / epoch : 2 / 
+- micro_f1_score : 66.296 / Auprc : 70.888
+
+- train
+```python
+dataset = load_data("../dataset/train/train.csv")
+
+training_args = TrainingArguments(
+  output_dir='./results',          # output directory
+  save_total_limit=5,              # number of total save model.
+  save_steps=500,                   # model saving step.
+  num_train_epochs=2,              # total number of training epochs
+  learning_rate=5e-5,               # learning_rate
+  per_device_train_batch_size=32,  # batch size per device during training
+  per_device_eval_batch_size=32,   # batch size for evaluation
+  warmup_steps=500,                # number of warmup steps for learning rate scheduler
+  weight_decay=0.01,               # strength of weight decay
+  logging_dir='./logs',            # directory for storing logs
+  logging_steps=100,              # log saving step.
+  evaluation_strategy='steps', # evaluation strategy to adopt during training
+                              # `no`: No evaluation during training.
+                              # `steps`: Evaluate every `eval_steps`.
+                              # `epoch`: Evaluate every end of epoch.
+  eval_steps = 500,            # evaluation step.
+  load_best_model_at_end = True 
+)
+
+# 본 제출(max_length = 128)
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(device)
+
+models = []
+stf = StratifiedKFold(n_splits = 5, shuffle = True, random_state = seed_everything(42))
+for fold, (train_idx, dev_idx) in enumerate(stf.split(dataset, list(dataset['label']))) :
+    print('Fold {}'.format(fold + 1))
+    model_config = AutoConfig.from_pretrained(MODEL_NAME)
+    model_config.num_labels = 30
+
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, config = model_config)
+    model.to(device)
+
+    train_dataset = dataset.iloc[train_idx]
+    dev_dataset = dataset.iloc[dev_idx]
+
+    train_label = label_to_num(train_dataset['label'].values)
+    dev_label = label_to_num(dev_dataset['label'].values)
+
+    tokenized_train = tokenized_dataset(train_dataset, tokenizer)
+    tokenized_dev = tokenized_dataset(dev_dataset, tokenizer)
+
+    RE_train_dataset = RE_Dataset(tokenized_train, train_label)
+    RE_dev_dataset = RE_Dataset(tokenized_dev, dev_label)
+
+    trainer = Trainer(
+    model=model,                         # the instantiated 🤗 Transformers model to be trained
+    args=training_args,                  # training arguments, defined above
+    train_dataset=RE_train_dataset,         # training dataset
+    eval_dataset=RE_dev_dataset,             # evaluation dataset
+    compute_metrics=compute_metrics         # define metrics function
+    )
+    trainer.train()
+    models.append(model)
+```
+
+- model save & load
+```python
+def makedirs(path) :
+    try :
+        os.makedirs(path)
+    except OSError :
+        if not os.path.isdir(path) :
+            raise
+
+for i, model in enumerate(models) :
+    makedirs(f'./best_model/kfold/fold_{i}/')
+    model.save_pretrained(f'./best_model/kfold/fold_{i}/')
+```
+
+- inference
+```python
+test_dataset_dir = "../dataset/test/test_data.csv"
+test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
+Re_test_dataset = RE_Dataset(test_dataset ,test_label) 
+
+dataloader = DataLoader(Re_test_dataset, batch_size=32, shuffle=False)
+
+oof_pred = None
+for i in range(5) :
+    model_name = '/opt/ml/code/best_model/kfold/fold_{}'.format(i)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    model.to(device)
+    model.eval()
+
+    output_pred = []
+    for i, data in enumerate(tqdm(dataloader)) :
+        with torch.no_grad() :
+            outputs = model(
+                input_ids=data['input_ids'].to(device),
+                attention_mask=data['attention_mask'].to(device),
+                token_type_ids=data['token_type_ids'].to(device)
+                )
+        logits = outputs[0]
+        prob = F.softmax(logits, dim = -1).detach().cpu().numpy()
+        output_pred.append(prob)
+    final_prob = np.concatenate(output_pred, axis = 0)
+
+    if oof_pred is None :
+        oof_pred = final_prob / 5
+    else :
+        oof_pred += final_prob / 5
+
+result = np.argmax(oof_pred, axis = -1)
+pred_answer = num_to_label(result)
+output_prob = oof_pred.tolist()
+
+output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
+output.to_csv('./prediction/submission.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
 ```
