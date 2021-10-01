@@ -179,7 +179,7 @@ for train_index, valid_index in stratified_kfold.split(df_train, df_train['label
     - end-to-end로 inference까지 진행된다. 최종 output만 결과 추출
         - 안좋다! -> 중간에 저장하는 것도 중요하고, 분업도 힘듬 -> Seconde Try 진행
 - /# of fold : 5 / epoch : 1 / 
-- Micro_f1_score : 62.046 / Auprc : 68.871 
+- Micro_f1_score : 64.046 / Auprc : 68.871 
 
 - train
 ```python
