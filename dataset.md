@@ -1,5 +1,7 @@
 ### 김준홍
+
 - preprocessing 부분만 손봤음.
+
 ```python
 import pickle as pickle
 import os
@@ -82,4 +84,67 @@ def tokenized_dataset(dataset, tokenizer):
 
     return tokenized_sentences
 
+```
+
+### 안영진
+
+```python
+import torch
+from torch.utils.data import DataLoader, Dataset
+class CustomDataset(Dataset):
+    """
+    Yields dict_keys(['input_ids', 'token_type_ids', 'attention_mask', 'label', 'subject_entity', 'object_entity'])
+    """
+    def __init__(
+        self,
+        df_data:pd.DataFrame,
+        tokenizer:AutoTokenizer,
+        max_token_length:int,
+        stopwords:list):
+        """ tokenized input and label """
+        self.label = torch.tensor(label_to_num(label=df_data['label'].values))
+        self.sentence = df_data['sentence']
+        self.subject_entity = df_data['subject_entity']
+        self.object_entity = df_data['object_entity']
+        self.tokenizer = tokenizer
+        self.max_token_length = max_token_length
+        self.stopwords = stopwords
+
+    def __getitem__(self, index:int):
+        """
+        Get item in forms of dictionary based on index number.
+
+        ### Side note for encode_plus: https://stackoverflow.com/a/61732210/8380469
+        `encode_plus` will:
+        (1) Tokenize the sentence.
+        (2) Prepend the `[CLS]` token to the start.
+        (3) Append the `[SEP]` token to the end.
+        (4) Map tokens to their IDs.
+        (5) Pad or truncate the sentence to `max_length`
+        (6) Create attention masks for [PAD] tokens.
+        """
+        item_sentence = self.sentence[index]
+        # tokenize sentence
+        encoded_dict = \
+            self.tokenizer.encode_plus(
+            item_sentence, # Sentence to encode.
+            add_special_tokens = True, # Add '[CLS]' and '[SEP]'
+            max_length = self.max_token_length, # Pad & truncate all sentences.
+            pad_to_max_length = True,
+            return_attention_mask = True,   # Construct attn. masks.
+            return_tensors = 'pt',     # Return pytorch tensors.
+            truncation=True
+        )
+
+        # make items' dictionary
+        # encoded_dict["attention_mask"] = encoded_dict["attention_mask"].squeeze(-1)
+        encoded_dict["label"] = self.label[index]
+        s = self.subject_entity[index]
+        o = self.object_entity[index]
+
+        return encoded_dict
+
+    def __len__(self):
+        """ return length of dataset """
+        return len(self.tokenized_input)
 ```
