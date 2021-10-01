@@ -1,4 +1,4 @@
-### ->
+### 안영진
 
 ```python
 # set device using torch
@@ -167,5 +167,3 @@ for train_index, valid_index in stratified_kfold.split(df_train, df_train['label
             steps += 1
 
 ```
-
-### <-
