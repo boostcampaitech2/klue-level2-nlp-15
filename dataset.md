@@ -44,7 +44,7 @@ def preprocessing_dataset(dataset):
         # 출처: https://stages.ai/competitions/75/discussion/talk/post/641 , 댓글 김민식님
         i = i[i.find("word") + 8 : i.find("start_idx") - 4]
         j = j[j.find("word") + 8 : j.find("start_idx") - 4]
-        s = re.sub(r"[“ ”]", '"', s)
+        s = re.sub(r"[“”]", '"', s)
 
         subject_entity.append(i)
         object_entity.append(j)
