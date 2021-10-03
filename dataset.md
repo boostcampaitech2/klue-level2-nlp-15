@@ -2,7 +2,7 @@
 - [김준홍](#김준홍)
 - [안영진](#안영진)
 - [최성욱](#최성욱)
-
+- [전재영](#전재영)
 ### 김준홍
 
 - preprocessing 부분만 손봤음.
@@ -174,3 +174,192 @@ def tokenized_dataset(dataset, tokenizer):
         )
     return tokenized_sentences
 ```
+
+### 전재영
+
+```python
+<sub>단어</sub>, <ob>단어</ob> 로 만들어주는 함수도 추가했습니다. -> 이때는 토크나이저에 이 토큰들을 추가하고 모델의 임베딩 사이즈를 바꿔주세요
+```
+
+
+```python
+import pickle as pickle
+import os
+import pandas as pd
+import torch
+from torch.utils.data import Dataset, Subset, random_split
+
+
+class RE_Dataset(torch.utils.data.Dataset):
+    """Dataset 구성을 위한 class."""
+
+    def __init__(self, pair_dataset, labels):
+        self.pair_dataset = pair_dataset
+        self.labels = labels
+
+    def __getitem__(self, idx):
+        item = {
+            key: torch.tensor(val[idx]).clone().detach()
+            for key, val in self.pair_dataset.items()
+        }
+        item["labels"] = torch.tensor(self.labels[idx])
+        return item
+
+    def __len__(self):
+        return len(self.labels)
+
+    def split_dataset(self, ratio=0.2):
+        """
+        데이터셋을 train 과 val 로 나눕니다,
+        pytorch 내부의 torch.utils.data.random_split 함수를 사용하여
+        torch.utils.data.Subset 클래스 둘로 나눕니다.
+        구현이 어렵지 않으니 구글링 혹은 IDE (e.g. pycharm) 의 navigation 기능을 통해 코드를 한 번 읽어보는 것을 추천드립니다^^
+        """
+        n_val = int(len(self) * ratio)
+        n_train = len(self) - n_val
+        train_set, val_set = random_split(self, [n_train, n_val])
+        return train_set, val_set
+
+
+def preprocessing_dataset(dataset):
+    """처음 불러온 csv 파일을 원하는 형태의 DataFrame으로 변경 시켜줍니다."""
+    dataset["sentence"] = dataset["sentence"].map(lambda x: x.replace("”", '"'))
+    dataset["sentence"] = dataset["sentence"].map(lambda x: x.replace('" "', ""))
+    dataset["sentence"] = dataset["sentence"].map(lambda x: x.replace("' '", ""))
+    subject_entity = []
+    object_entity = []
+    for i, j in zip(dataset["subject_entity"], dataset["object_entity"]):
+        i = i[1:-1].split(",")[0].split(":")[1]
+        j = j[1:-1].split(",")[0].split(":")[1]
+
+        subject_entity.append(i)
+        object_entity.append(j)
+    out_dataset = pd.DataFrame(
+        {
+            "id": dataset["id"],
+            "sentence": dataset["sentence"],
+            "subject_entity": subject_entity,
+            "object_entity": object_entity,
+            "label": dataset["label"],
+        }
+    )
+    return out_dataset
+
+
+def load_more_data(dataset_dir, ratio=0.2):
+    """ return train_set, test_set, if you want you can get augmentation in tran_set"""
+    pd_dataset = pd.read_csv(dataset_dir)
+
+    valid_len = int(len(pd_dataset) * 0.2)
+    train_set, dev_set = (
+        pd_dataset.loc[: len(pd_dataset) - valid_len],
+        pd_dataset.loc[len(pd_dataset) - valid_len :],
+    )
+
+    train_set = make_more_data(train_set)
+
+    train_set = preprocessing_dataset(train_set)
+    dev_set = preprocessing_dataset(dev_set)
+    return train_set, dev_set
+
+
+def make_more_data(dataset):
+    # if with changing label key to value, make more data
+    change_dict = {
+        "org:member_of": "org:members",
+        "org:members": "org:member_of",
+        "per:spouse": "per:spouse",
+        "per:colleagues": "per:colleagues",
+        "per:parents": "per:children",
+        "per:children": "per:parents",
+        "per:other_family": "per:other_family",
+        "per:siblings": "per:siblings",
+        "org:top_members/employees": "per:employee_of",
+        "per:employee_of": "org:top_members/employees",
+        "org:alternate_names": "org:alternate_names",
+        "per:alternate_names": "per:alternate_names",
+    }
+    x = len(dataset)
+    for i in range(x):
+        if dataset.loc[i]["label"] in change_dict:
+            dataset = dataset.append(
+                {
+                    "sentence": dataset.loc[i]["sentence"],
+                    "subject_entity": dataset.loc[i]["object_entity"],
+                    "object_entity": dataset.loc[i]["subject_entity"],
+                    "label": change_dict[dataset.loc[i]["label"]],
+                    "source": dataset.loc[i]["source"],
+                },
+                ignore_index=True,
+            )
+    return dataset
+
+
+def preprocessing_datasets(dataset):
+    """처음 불러온 csv 파일을 원하는 형태의 DataFrame으로 변경 시켜줍니다."""
+    subject_entity = []
+    object_entity = []
+    for i, j in zip(dataset["subject_entity"], dataset["object_entity"]):
+        subject_entity.append(i["word"])
+        object_entity.append(j["word"])
+    out_dataset = pd.DataFrame(
+        {
+            "id": dataset["id"],
+            "sentence": dataset["sentence"],
+            "subject_entity": subject_entity,
+            "object_entity": object_entity,
+            "label": dataset["label"],
+        }
+    )
+    return out_dataset
+
+
+def my_tokenized_dataset(dataset, tokenizer):
+    """ tokenized dataset, but unlike tokenized_dataset reslut is only original setence, not subject word <sep> object word <sep> original sentence"""
+    tokenized_sentences = tokenizer(
+        list(dataset["sentence"]),
+        return_tensors="pt",
+        padding=True,
+        truncation=True,
+        max_length=514,
+        add_special_tokens=True,
+    )
+    return tokenized_sentences
+
+
+def tokenize(sentence, subject_entity, object_entity):
+    """ replace subject word to '<sub>word</sub>
+        replace subject word to '<ob>word</ob>
+     """
+    sentence = (
+        sentence[: subject_entity["start_idx"]]
+        + "<sub>"
+        + subject_entity["word"]
+        + "</sub>"
+        + sentence[subject_entity["end_idx"] + 1 :]
+    )
+    sentence = sentence.replace(
+        object_entity["word"], "<ob>" + object_entity["word"] + "</ob>"
+    )
+    return sentence
+
+
+def load_my_data(dataset_dir):
+    """csv 파일을 경로에 맡게 불러 옵니다."""
+    pd_dataset = pd.read_csv(dataset_dir)
+    pd_dataset["subject_entity"] = pd_dataset["subject_entity"].map(lambda x: eval(x))
+    pd_dataset["object_entity"] = pd_dataset["object_entity"].map(lambda x: eval(x))
+    pd_dataset["sentence"] = pd_dataset.apply(
+        lambda x: tokenize(x["sentence"], x["subject_entity"], x["object_entity"]),
+        axis=1,
+    )
+    # print(pd_dataset['sentence'][0])
+    dataset = preprocessing_datasets(pd_dataset)
+
+    return dataset
+
+
+
+```
+
+
