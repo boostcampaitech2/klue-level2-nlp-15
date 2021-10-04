@@ -94,6 +94,40 @@ def tokenized_dataset(dataset, tokenizer):
 ### 안영진
 
 ```python
+def pull_out_dictionary(df_input: pd.DataFrame):
+
+    df = df_input.copy()
+
+    # assign subject_entity and object_entity column values type as dictionary
+    df['subject_entity'] = df['subject_entity'].apply(lambda x: eval(x))
+    df['object_entity'] = df['object_entity'].apply(lambda x: eval(x))
+
+    # parse item inside of subject_entity and object_entity's dictionary values as columns of dataframe
+    # word, start_idx, end_idx, type as new columns 
+    df = df.assign(
+        # subject_entity
+        subject_word=lambda x: x['subject_entity'].apply(lambda x: x['word']),
+        subject_start_idx=lambda x: x['subject_entity'].apply(lambda x: x['start_idx']),
+        subject_end_idx=lambda x: x['subject_entity'].apply(lambda x: x['end_idx']),
+        subject_type=lambda x: x['subject_entity'].apply(lambda x: x['type']),
+        
+        # object_entity
+        object_word=lambda x: x['object_entity'].apply(lambda x: x['word']),
+        object_start_idx=lambda x: x['object_entity'].apply(lambda x: x['start_idx']),
+        object_end_idx=lambda x: x['object_entity'].apply(lambda x: x['end_idx']),
+        object_type=lambda x: x['object_entity'].apply(lambda x: x['type']),
+    )
+
+    # drop subject_entity and object_entity column
+    df = df.drop(['subject_entity', 'object_entity'], axis=1)
+
+    return df
+
+df_train = pull_out_dictionary(df_train)
+df_test = pull_out_dictionary(df_test)
+```
+
+```python
 import torch
 from torch.utils.data import DataLoader, Dataset
 class CustomDataset(Dataset):
