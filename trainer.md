@@ -1,6 +1,7 @@
 ## Tariner를 보고싶다면?! 이름을 끌릭하세요~!
 - [안영진](#안영진)
 - [최성욱](#최성욱)
+- [전재영](#전재영)
 
 ### 안영진
 
@@ -472,4 +473,172 @@ output_prob = oof_pred.tolist()
 
 output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
 output.to_csv('./prediction/submission.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+```
+
+
+### 전재영
+#### two model inference 입니다(결과가 좋지는 않네요 ㅠ)
+```python
+from transformers import (
+    AutoTokenizer,
+    AutoConfig,
+    AutoModelForSequenceClassification,
+    Trainer,
+    TrainingArguments,
+)
+from torch.utils.data import DataLoader
+from load_data import *
+import pandas as pd
+import torch
+import torch.nn.functional as F
+
+import pickle as pickle
+import numpy as np
+import argparse
+from tqdm import tqdm
+import torch.nn as nn
+
+""" model1: 관계가 있는 데이터(1-29의 데이터)로 학습한 모델, 데이터의 관계를 뽑아냄, 1-29의 결과를 내뱉지만 라벨은 30개가 있습니다.
+    model2: train set에 대해 관계가 있는지 없는지 두 개의 라벨로 학습한 라벨
+모든 데이터에 대하여 model 1으로  29개의 라벨을 뽑은 뒤에, model 2가 no_relation으로 예측한 정답을 no_relation으로 바꿔주는 과정을 거칩니다.
+
+def inference(model, tokenized_sent, device):
+    """
+    test dataset을 DataLoader로 만들어 준 후,
+    batch_size로 나눠 model이 예측 합니다.
+    """
+    dataloader = DataLoader(tokenized_sent, batch_size=16, shuffle=False)
+    model.eval()
+    output_pred = []
+    output_prob = []
+    for i, data in enumerate(tqdm(dataloader)):
+        with torch.no_grad():
+            outputs = model(
+                input_ids=data["input_ids"].to(device),
+                attention_mask=data["attention_mask"].to(device),
+                # token_type_ids=data["token_type_ids"].to(device),
+            )
+        logits = outputs[0]
+        prob = F.softmax(logits, dim=-1).detach().cpu().numpy()
+        logits = logits.detach().cpu().numpy()
+        result = np.argmax(logits, axis=-1)
+
+        output_pred.append(result)
+        output_prob.append(prob)
+
+    return (
+        np.concatenate(output_pred).tolist(),
+        np.concatenate(output_prob, axis=0).tolist(),
+    )
+
+
+def num_to_label(label):
+    """
+    숫자로 되어 있던 class를 원본 문자열 라벨로 변환 합니다.
+    """
+    origin_label = []
+    with open("dict_num_to_label.pkl", "rb") as f:
+        dict_num_to_label = pickle.load(f)
+    for v in label:
+        origin_label.append(dict_num_to_label[v])
+
+    return origin_label
+
+
+def load_test_dataset(dataset_dir, tokenizer):
+    """
+    test dataset을 불러온 후,
+    tokenizing 합니다.
+    """
+    test_dataset = load_my_data(dataset_dir)
+
+    test_label = list(map(int, test_dataset["label"].values))
+    # tokenizing dataset
+    tokenized_test = tokenized_dataset(test_dataset, tokenizer)
+    return test_dataset["id"], tokenized_test, test_label
+
+
+def my_load_test_dataset(dataset_dir, tokenizer):
+    """
+    test dataset을 불러온 후,
+    tokenizing 합니다.
+    """
+    test_dataset = load_my_data(dataset_dir)
+
+    test_label = list(map(int, test_dataset["label"].values))
+    # tokenizing dataset
+    tokenized_test = my_tokenized_dataset(test_dataset, tokenizer)
+    return test_dataset["id"], tokenized_test, test_label
+
+
+def main(args):
+    """
+    주어진 dataset csv 파일과 같은 형태일 경우 inference 가능한 코드입니다.
+    """
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # load tokenizer
+    Tokenizer_NAME = "klue/bert-base"
+    tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
+
+    ## load my model , model1은 29개의 관계를 뽑는 모델, model2는 no_relation과 relation을 뽑는 모델
+    # MODEL_NAME = args.model_dir1  # model dir.
+    model1 = AutoModelForSequenceClassification.from_pretrained(args.model_dir1)
+    model2 = AutoModelForSequenceClassification.from_pretrained(args.model_dir2)
+    model1.to(device)  
+    model2.to(device) 
+
+    ## load test datset
+    test_dataset_dir = "../dataset/test/test_data.csv"
+    test_id, test_dataset, test_label = load_test_dataset(test_dataset_dir, tokenizer)
+    Re_test_dataset = RE_Dataset(test_dataset, test_label)
+
+    ## predict answer
+    pred_answer, output_prob = inference(
+        model1, Re_test_dataset, device
+    )  # model에서 class 추론
+    pred_answer = num_to_label(pred_answer)  # 숫자로 된 class를 원래 문자열 라벨로 변환.
+
+    ## make csv file with predicted answer
+    #########################################################
+    # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
+    output = pd.DataFrame(
+        {
+            "id": test_id,
+            "pred_label": pred_answer,
+            "probs": output_prob,
+        }
+    )
+    ### 위에까지는 모델을 두개 불러오는 것 뺴고는 inference.py와 같습니다
+ 
+    with torch.no_grad():
+        m = nn.Softmax(dim=1)
+        for idx in tqdm(range(len(Re_test_dataset))):
+            data = {i: v.to(device).unsqueeze(0) for i, v in Re_test_dataset[idx].items()}
+            out = model2(input_ids = data['input_ids'],attention_mask = data['attention_mask'])
+            logit = out['logits']
+            logit = m(logit)
+            predicted = torch.argmax(logit, -1)
+            if predicted == 0:  # 예측이 0이면
+                output["pred_label"][idx] = 'no_relation'
+                #확률변화- 기존의 확률에서 label 0의 확률은 model 2의 0의 확률로 바꾸고 전체의 합이 1이 되도록 정규화
+                output["probs"][idx][0] = logit[0][0].item()
+                output["probs"][idx] = torch.tensor(output["probs"][idx]) / torch.sum(torch.tensor(output["probs"][idx]))
+                output["probs"][idx] = output["probs"][idx].tolist()
+    output.to_csv(
+        "./prediction/submission.csv", index=False
+    )  # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+    #### 필수!! ##############################################
+    print("---- Finish! ----")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    # model dir
+    parser.add_argument("--model_dir1", type=str, default="./best_model1")
+    parser.add_argument("--model_dir2", type=str, default="./best_model2")
+    args = parser.parse_args()
+    print(args)
+    main(args)
+
 ```
