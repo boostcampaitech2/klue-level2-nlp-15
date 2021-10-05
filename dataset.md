@@ -129,6 +129,89 @@ df_test = pull_out_dictionary(df_test)
 
 ```python
 import torch
+from torch.utils.data import Dataset, DataLoader
+
+class CustomDataset(Dataset):
+    def __init__(self, tokenized_dataset, labels, tokenizer, model_name):
+        self.tokenized_dataset = tokenized_dataset
+        self.labels = labels
+        self.tokenizer = tokenizer
+        self.model_name = model_name
+        self.start_entity_id = None
+        self.end_entity_id = None
+
+        if self.model_name == "xlm-roberta-large":
+            vocab = tokenizer.get_vocab()
+        elif self.model_name == "R-BERT":
+            vocab = tokenizer.get_vocab()
+            self.start_entity_id = vocab["[ENT]"]
+            self.end_entity_id = vocab["[/ENT]"]
+        else:
+            pass
+    
+    def __getitem__(self, index):
+        # item = {key: torch.tensor(val) for key, val in self.encodings[index].items()}
+        item = {key: torch.tensor(val[index]) for key, val in self.tokenized_dataset.items()}
+        item["label"] = torch.tensor(self.labels[index])
+
+        if self.model_name == "xlm-roberta-large":
+            pass
+        elif self.model_name == "R-BERT":
+            entity_ids = []
+            FLAG = False # flag for whether the entity is in the sentence
+            cnt = 0
+            for input_id in item["input_ids"]:
+                # 0 for entity, 1 for non-entity
+                if input_id == self.start_entity_id:
+                    FLAG = True
+                    cnt += 1
+                    entity_ids.append(0)
+                    continue
+                elif input_id == self.end_entity_id:
+                    FLAG = False
+                    entity_ids.append(0)
+                if FLAG:
+                    entity_ids.append(1)
+                else:
+                    entity_ids.append(0)
+            item["entity_ids"] = torch.tensor(entity_ids)
+        else:
+            pass
+        return item
+    
+    def __len__(self):
+        return len(self.labels)
+
+import pandas as pd
+import pickle as pickle
+
+def label_to_num(pkl_path=os.path.join(BASELINE_DIR, "dict_label_to_num.pkl"), label=None):
+  num_label = []
+  with open(pkl_path, 'rb') as f:
+    dict_label_to_num = pickle.load(f)
+  for v in label:
+    num_label.append(dict_label_to_num[v])
+  
+  return num_label
+
+def change_label_to_num(df_input: pd.DataFrame, pkl_path=os.path.join(BASELINE_DIR, "dict_label_to_num.pkl")):
+  df = df_input.copy()
+  df["label"] = label_to_num(pkl_path, df["label"])
+  return df
+
+def load_data(dataset_path:str):
+  """ csv 파일을 경로에 맡게 불러 옵니다. """
+  df = pd.read_csv(dataset_path)
+  df = pull_out_dictionary(df)
+  df = change_label_to_num(df)
+  
+  return df
+
+load_data(TRAIN_FILE_PATH).head(2)
+```
+
+```python
+import torch
 from torch.utils.data import DataLoader, Dataset
 class CustomDataset(Dataset):
     """
@@ -186,6 +269,45 @@ class CustomDataset(Dataset):
     def __len__(self):
         """ return length of dataset """
         return len(self.tokenized_input)
+
+def tokenized_dataset(dataset, tokenizer, model_name, max_token_length:int=128):
+    list_entity_concated = []
+    list_sentence_ent_added = []
+    
+
+    # subject_word, subject_start_idx, subject_end_idx, subject_type
+    # display(dataset.head(2))
+    for _, sentence, label, _, \
+        subject_word, subject_start_idx, subject_end_idx, subject_type, \
+        object_word, object_start_idx, object_end_idx, object_type \
+        in tqdm(dataset.itertuples(index=False)):
+        
+        str_temp = ""
+        str_temp = subject_word + "[SEP]" + object_word
+        list_entity_concated.append(str_temp)
+
+        # insert [ENT] before and after (subject_word and object_word)
+        sentence = sentence.replace(subject_word, "[ENT]" + subject_word + "[/ENT]")
+        sentence = sentence.replace(object_word, "[ENT]" + object_word + "[/ENT]")
+
+        list_sentence_ent_added.append(sentence)
+    
+    
+    max_token_length += 4 # [ENT] + [/ENT]
+    # tokenize sentence
+
+    print(list_sentence_ent_added[:2], len(list_sentence_ent_added))
+    tokenized_sentence = tokenizer(
+        list_entity_concated,
+        list_sentence_ent_added, # Sentences to encode.
+        add_special_tokens = True, # Add '[CLS]' and '[SEP]'
+        max_length = max_token_length, # Pad & truncate all sentences.
+        pad_to_max_length = True,
+        return_tensors = 'pt',     # Return pytorch tensors.
+        truncation=True
+    )
+
+    return tokenized_sentence
 ```
 
 ### 최성욱
