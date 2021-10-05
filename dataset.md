@@ -3,6 +3,7 @@
 - [안영진](#안영진)
 - [최성욱](#최성욱)
 - [전재영](#전재영)
+- [김연주](#김연주)
 ### 김준홍
 
 - preprocessing 부분만 손봤음.
@@ -519,3 +520,218 @@ def load_my_data(dataset_dir):
 ```
 
 
+### 김연주
+```python
+import random
+import pickle
+import re
+import pandas as pd
+import copy
+
+wordnet = {}
+with open("./wordnet.pickle", "rb") as f:
+	wordnet = pickle.load(f)
+
+
+########################################################################
+# Synonym replacement
+# Replace n words in the sentence with synonyms from wordnet
+########################################################################
+def synonym_replacement(words, n):
+	new_words = words.copy()
+	random_word_list = list(set([word for word in words]))
+	random.shuffle(random_word_list)
+	num_replaced = 0
+	for random_word in random_word_list:
+		synonyms = get_synonyms(random_word)
+		if len(synonyms) >= 1:
+			synonym = random.choice(list(synonyms))
+			new_words = [synonym if word == random_word else word for word in new_words]
+			num_replaced += 1
+		if num_replaced >= n:
+			break
+
+	if len(new_words) != 0:
+		sentence = ' '.join(new_words)
+		new_words = sentence.split(" ")
+
+	else:
+		new_words = ""
+
+	return new_words
+
+
+def get_synonyms(word):
+	synomyms = []
+
+	try:
+		for syn in wordnet[word]:
+			for s in syn:
+				synomyms.append(s)
+	except:
+		pass
+
+	return synomyms
+
+########################################################################
+# Random deletion
+# Randomly delete words from the sentence with probability p
+########################################################################
+def random_deletion(words, p):
+	# if len(words) == 1:
+	# 	return words
+
+	new_words = []
+	for word in words:
+		r = random.uniform(0, 1)
+		if r > p:
+			new_words.append(word)
+
+	# if len(new_words) == 0:
+	if '<subject>' not in new_words or '<object>' not in new_words:
+		# rand_int = random.randint(0, len(words)-1)
+		# return [words[rand_int]]
+		return words
+
+	return new_words
+
+########################################################################
+# Random swap
+# Randomly swap two words in the sentence n times
+########################################################################
+def random_swap(words, n):
+	new_words = words.copy()
+	for _ in range(n):
+		new_words = swap_word(new_words)
+
+	return new_words
+
+def swap_word(new_words):
+	random_idx_1 = random.randint(0, len(new_words)-1)
+	random_idx_2 = random_idx_1
+	counter = 0
+
+	while random_idx_2 == random_idx_1:
+		random_idx_2 = random.randint(0, len(new_words)-1)
+		counter += 1
+		if counter > 3:
+			return new_words
+
+	new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1]
+	return new_words
+
+########################################################################
+# Random insertion
+# Randomly insert n words into the sentence
+########################################################################
+def random_insertion(words, n):
+	new_words = words.copy()
+	for _ in range(n):
+		add_word(new_words)
+	
+	return new_words
+
+def add_word(new_words):
+	synonyms = []
+	counter = 0
+	while len(synonyms) < 1:
+		if len(new_words) >= 1:
+			random_word = new_words[random.randint(0, len(new_words)-1)]
+			synonyms = get_synonyms(random_word)
+			counter += 1
+		else:
+			random_word = ""
+		if counter >= 10:
+			return
+		
+	random_synonym = synonyms[0]
+	random_idx = random.randint(0, len(new_words)-1)
+	new_words.insert(random_idx, random_synonym)
+
+
+def augment(sentence, subject, object, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9):
+		
+	words = sentence.split(' ')
+	words = [word for word in words if word != "" ]
+	num_words = len(words)
+
+	augmented_sentences = []
+	num_new_per_technique = int(num_aug/4) + 1
+
+	n_sr = max(1, int(alpha_sr*num_words))
+	n_ri = max(1, int(alpha_ri*num_words))
+	n_rs = max(1, int(alpha_rs*num_words))
+
+	# Synonym replacement
+	for _ in range(num_new_per_technique):
+		a_words = synonym_replacement(words, n_sr)
+		augmented_sentences.append(' '.join(a_words))
+
+	# Random insertion
+	for _ in range(num_new_per_technique):
+		a_words = random_insertion(words, n_ri)
+		augmented_sentences.append(' '.join(a_words))
+
+	# Random swap
+	for _ in range(num_new_per_technique):
+		a_words = random_swap(words, n_rs)
+		augmented_sentences.append(" ".join(a_words))
+
+	# Random deletion
+	for _ in range(num_new_per_technique):
+		a_words = random_deletion(words, p_rd)
+		augmented_sentences.append(" ".join(a_words))
+
+	random.shuffle(augmented_sentences)
+
+	if num_aug >= 1:
+		augmented_sentences = augmented_sentences[:num_aug]
+	else:
+		keep_prob = num_aug / len(augmented_sentences)
+		augmented_sentences = [s for s in augmented_sentences if random.uniform(0, 1) < keep_prob]
+
+	augmented_sentences.append(sentence)
+
+	return augmented_sentences
+
+if __name__ == '__main__':
+	dir = '../../dataset/train/train.csv'
+	df = pd.read_csv(dir, index_col = 0)
+
+	for i, d in df.iterrows():
+		label = d.label
+		if label == "no_relation": continue
+
+		subject_entity = eval(d.subject_entity)
+		subject = subject_entity['word']
+		object_entity =eval(d.object_entity)
+		object = object_entity['word']
+		sentence = d.sentence.replace(subject, '<subject>').replace(object, '<object>')
+		source = d.source
+
+		new_sentences = augment(sentence, subject, object, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9)
+
+		for sen in new_sentences:
+			if sen==sentence: continue
+			try:
+				print(f'### {i} : {sen}')
+				# id, sentences, subject_entity, object_entity, label, source
+				subject_entity['start_idx'] = sen.index('<subject>')
+				subject_entity['end_idx'] = subject_entity['start_idx']+len(subject)-1
+				object_entity['start_idx'] = sen.index('<object>')
+				object_entity['end_idx'] = object_entity['start_idx']+len(object)-1
+				sen = sen.replace('<subject>', subject).replace('<object>', object)
+
+				data_to_insert = {'sentence' : sen, 'subject_entity': subject_entity, 'object_entity': object_entity,'label': label,'source' : source}
+
+				df = df.append(data_to_insert, ignore_index=True)
+
+			except:
+				continue
+			
+	# print(df)
+	# df = df.drop(df.columns[0], axis=1)
+	df.to_csv("../../dataset/train/aug_train.csv")
+	
+
+```
