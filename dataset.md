@@ -566,8 +566,8 @@ def get_synonyms(word):
 
 	try:
 		for syn in wordnet[word]:
-			for s in syn:
-				synomyms.append(s)
+			synomyms.append(syn)
+			
 	except:
 		pass
 
