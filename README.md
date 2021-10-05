@@ -4,7 +4,7 @@
 
 - [x] entity_1, entity_2, [CLS]에서 hidden state vector을 뽑아내서 concat하기  -> 세현
 
-  - [ ] Improved Baseline -> 현수
+  - [ ] entity는 "#", "@"로 감싸는 작업 수행: [Improved Baseline](https://arxiv.org/pdf/2102.01373.pdf) -> 현수,영진
 
 - [ ] **Bidirectional RNN을 backbone 뒤에다가 붙여보기** 
 
