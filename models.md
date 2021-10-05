@@ -159,113 +159,40 @@ class RBERT(nn.Module):
 
 ```python
 from torch import nn
-from transformers import AutoTokenizer, AutoModel, AutoConfig, BertModel, BertForSequenceClassification
-from transformers.modeling_outputs import SequenceClassifierOutput
+import torch
+from transformers import AutoTokenizer, AutoModel, AutoConfig, 
 
-""" 실...패....ㅠㅠ  업데이트 중 """
-class CustomBert(BertForSequenceClassification):
-    def __init__(self, config):
-        super().__init__(config)
-        self.num_labels = config.num_labels
-        self.config = config
-        self.bert = BertModel(config)
-        self.classifier = nn.Linear(config.hidden_size*3, config.num_labels)
-        self.init_weights()
-        self.tokenizer = BertTokenizerFast.from_pretrained("klue/bert-base")
+""" "RE_ Improved Baseline" """
+class CustomModel(nn.Module):
+    def __init__(self, model_name, config):
+        super().__init__()
+        self.encoder = AutoModel.from_pretrained(model_name, config=config)
+        hidden_size = config.hidden_size
+        self.loss_fnt = nn.CrossEntropyLoss()
+        self.classifier = nn.Sequential(
+            nn.Linear(hidden_size*2, hidden_size),
+            nn.ReLU(),
+            nn.Dropout(p=0.1),
+            nn.Linear(hidden_size, config.num_labels)
+        )
 
-    def forward(
-        self,
-        input_ids=None,
-        attention_mask=None,
-        token_type_ids=None,
-        position_ids=None,
-        head_mask=None,
-        inputs_embeds=None,
-        labels=None,
-        output_attentions=None,
-        output_hidden_states=None,
-        return_dict=None,
-    ):
-
-        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
-
-        outputs = self.bert(
+    @autocast()
+    def forward(self, input_ids=None, attention_mask=None, labels=None, ss=None, es=None):
+        outputs = self.encoder(
             input_ids,
             attention_mask=attention_mask,
-            token_type_ids=token_type_ids,
-            position_ids=position_ids,
-            head_mask=head_mask,
-            inputs_embeds=inputs_embeds,
-            output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
         )
-
-        cls = outputs[1]
-        hidden_states = outputs[2]
-        mask_index = []
-        for i in range(len(input_ids)):
-            mask_index.append(torch.where(input_ids[i] == self.tokenizer.mask_token_id)[0].tolist())
-        #mask_index = torch.where(input_ids[0] == self.tokenizer.mask_token_id)
-        token_embeddings = torch.stack(hidden_states, dim=0)
-
-        token_embeddings = torch.squeeze(token_embeddings, dim=1)
-        token_embeddings = token_embeddings.permute(1, 0, 2,3)
-        token_vecs_sum = []
-        for token in token_embeddings:
-           sum_vec = torch.sum(token, dim=0)
-           token_vecs_sum.append(sum_vec)
-        out_vecs = []
-
-        for i in range(len(token_vecs_sum)):
-            tmp = token_vecs_sum[i]
-            out_vec = torch.cat([tmp[j].unsqueeze(0) for j in mask_index[i]], dim = -1)
-            out_vecs.append(out_vec.squeeze(0).tolist())
-        out_vecs = torch.tensor(out_vecs, device= torch.device("cuda"))
-        '''
-        for i in range(len(mask_index)):
-            out_vec = torch.cat(
-                [token_vecs_sum[j].unsqueeze(0) for j in mask_index[i]],
-                                dim = -1
-            ))
-        '''
-        outs = torch.cat((cls, out_vecs), dim = 1)
-        outs = outs.to(torch.device("cuda"))
-        pooled_output = self.dropout(outs)
-        logits = self.classifier(pooled_output)
-
-        loss = None
+        pooled_output = outputs[0]
+        idx = torch.arange(input_ids.size(0)).to(input_ids.device)
+        ss_emb = pooled_output[idx, ss]
+        es_emb = pooled_output[idx, es]
+        h = torch.cat((ss_emb, es_emb), dim=-1)
+        logits = self.classifier(h)
+        outputs = (logits,)
         if labels is not None:
-            if self.config.problem_type is None:
-                if self.num_labels == 1:
-                    self.config.problem_type = "regression"
-                elif self.num_labels > 1 and (labels.dtype == torch.long or labels.dtype == torch.int):
-                    self.config.problem_type = "single_label_classification"
-                else:
-                    self.config.problem_type = "multi_label_classification"
-
-            if self.config.problem_type == "regression":
-                loss_fct = MSELoss()
-                if self.num_labels == 1:
-                    loss = loss_fct(logits.squeeze(), labels.squeeze())
-                else:
-                    loss = loss_fct(logits, labels)
-            elif self.config.problem_type == "single_label_classification":
-                loss_fct = CrossEntropyLoss()
-                loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
-            elif self.config.problem_type == "multi_label_classification":
-                loss_fct = BCEWithLogitsLoss()
-                loss = loss_fct(logits, labels)
-        if not return_dict:
-            output = (logits,) + outputs[2:]
-            return ((loss,) + output) if loss is not None else output
-
-        return SequenceClassifierOutput(
-            loss=loss,
-            logits=logits,
-            hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions,
-        )
+            loss = self.loss_fnt(logits.float(), labels)
+            outputs = (loss,) + outputs
+        return outputs
 
 ```
 
