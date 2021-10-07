@@ -1,0 +1,249 @@
+2021-10-07 04:06:48,023 INFO    MainThread:1551 [wandb_setup.py:_flush():69] setting env: {}
+2021-10-07 04:06:48,023 INFO    MainThread:1551 [wandb_setup.py:_flush():69] setting login settings: {}
+2021-10-07 04:06:48,023 INFO    MainThread:1551 [wandb_setup.py:_flush():69] setting login settings: {'mode': 'offline'}
+2021-10-07 04:06:48,023 INFO    MainThread:1551 [wandb_init.py:_log_setup():357] Logging user logs to /opt/ml/klue-level2-nlp-15/wandb/offline-run-20211007_040648-2fcm3utd/logs/debug.log
+2021-10-07 04:06:48,023 INFO    MainThread:1551 [wandb_init.py:_log_setup():358] Logging internal logs to /opt/ml/klue-level2-nlp-15/wandb/offline-run-20211007_040648-2fcm3utd/logs/debug-internal.log
+2021-10-07 04:06:48,023 INFO    MainThread:1551 [wandb_init.py:_jupyter_setup():307] configuring jupyter hooks <wandb.sdk.wandb_init._WandbInit object at 0x7f4e4b0d6bb0>
+2021-10-07 04:06:48,024 INFO    MainThread:1551 [wandb_init.py:init():390] calling init triggers
+2021-10-07 04:06:48,024 INFO    MainThread:1551 [wandb_init.py:init():395] wandb.init called with sweep_config: {}
+config: {}
+2021-10-07 04:06:48,024 INFO    MainThread:1551 [wandb_init.py:init():435] starting backend
+2021-10-07 04:06:48,024 INFO    MainThread:1551 [backend.py:_multiprocessing_setup():70] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2021-10-07 04:06:48,063 INFO    MainThread:1551 [backend.py:ensure_launched():135] starting backend process...
+2021-10-07 04:06:48,108 INFO    MainThread:1551 [backend.py:ensure_launched():139] started backend process with pid: 1675
+2021-10-07 04:06:48,110 INFO    MainThread:1551 [wandb_init.py:init():440] backend started and connected
+2021-10-07 04:06:48,130 INFO    MainThread:1551 [wandb_run.py:_label_probe_notebook():833] probe notebook
+2021-10-07 04:06:48,131 INFO    MainThread:1551 [wandb_run.py:_label_probe_notebook():843] Unable to probe notebook: 'NoneType' object has no attribute 'get'
+2021-10-07 04:06:48,131 INFO    MainThread:1551 [wandb_init.py:init():499] updated telemetry
+2021-10-07 04:06:48,132 INFO    MainThread:1551 [wandb_init.py:init():562] starting run threads in backend
+2021-10-07 04:06:53,141 INFO    MainThread:1551 [wandb_run.py:_console_start():1651] atexit reg
+2021-10-07 04:06:53,141 INFO    MainThread:1551 [wandb_run.py:_redirect():1525] redirect: SettingsConsole.WRAP
+2021-10-07 04:06:53,141 INFO    MainThread:1551 [wandb_run.py:_redirect():1562] Wrapping output streams.
+2021-10-07 04:06:53,184 INFO    MainThread:1551 [wandb_run.py:_redirect():1586] Redirects installed.
+2021-10-07 04:06:53,184 INFO    MainThread:1551 [wandb_init.py:init():587] run started, returning control to user process
+2021-10-07 04:06:53,186 INFO    MainThread:1551 [wandb_run.py:_config_callback():878] config_cb None None {'output_dir': '/opt/ml/results', 'overwrite_output_dir': False, 'do_train': False, 'do_eval': True, 'do_predict': False, 'evaluation_strategy': 'steps', 'prediction_loss_only': False, 'per_device_train_batch_size': 32, 'per_device_eval_batch_size': 32, 'per_gpu_train_batch_size': 'None', 'per_gpu_eval_batch_size': 'None', 'gradient_accumulation_steps': 1, 'eval_accumulation_steps': 'None', 'learning_rate': 5e-05, 'weight_decay': 0.01, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'num_train_epochs': 3, 'max_steps': -1, 'lr_scheduler_type': 'linear', 'warmup_ratio': 0.0, 'warmup_steps': 300, 'log_level': -1, 'log_level_replica': -1, 'log_on_each_node': True, 'logging_dir': '/opt/ml/logs', 'logging_strategy': 'steps', 'logging_first_step': False, 'logging_steps': 500, 'save_strategy': 'steps', 'save_steps': 500, 'save_total_limit': 5, 'save_on_each_node': False, 'no_cuda': False, 'seed': 42, 'fp16': False, 'fp16_opt_level': 'O1', 'fp16_backend': 'auto', 'fp16_full_eval': False, 'local_rank': -1, 'tpu_num_cores': 'None', 'tpu_metrics_debug': False, 'debug': '[]', 'dataloader_drop_last': False, 'eval_steps': 500, 'dataloader_num_workers': 4, 'past_index': -1, 'run_name': 'add_lstm', 'disable_tqdm': False, 'remove_unused_columns': True, 'label_names': 'None', 'load_best_model_at_end': True, 'metric_for_best_model': 'f1', 'greater_is_better': True, 'ignore_data_skip': False, 'sharded_ddp': '[]', 'deepspeed': 'None', 'label_smoothing_factor': 0.0, 'adafactor': False, 'group_by_length': True, 'length_column_name': 'length', 'report_to': "['wandb']", 'ddp_find_unused_parameters': 'None', 'dataloader_pin_memory': True, 'skip_memory_metrics': True, 'use_legacy_prediction_loop': False, 'push_to_hub': False, 'resume_from_checkpoint': 'None', 'push_to_hub_model_id': 'results', 'push_to_hub_organization': 'None', 'push_to_hub_token': '<PUSH_TO_HUB_TOKEN>', '_n_gpu': 1, 'mp_parameters': '', 'train_batch_size': 32, 'eval_batch_size': 32}
+2021-10-07 04:06:53,187 INFO    MainThread:1551 [wandb_watch.py:watch():43] Watching
+2021-10-07 04:07:15,264 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:07:15,264 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:07:22,459 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:07:22,463 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:07:22,465 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:07:24,131 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:07:24,132 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:07:24,133 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:07:24,400 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:07:24,402 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:07:24,402 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:07:24,679 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:07:24,680 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:07:24,681 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:07:24,930 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:07:24,931 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:07:24,932 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:07:25,196 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:07:25,462 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:07:25,462 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:07:25,649 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:07:41,504 INFO    MainThread:1551 [wandb_run.py:_config_callback():878] config_cb None None {'output_dir': '/opt/ml/results', 'overwrite_output_dir': False, 'do_train': False, 'do_eval': True, 'do_predict': False, 'evaluation_strategy': 'steps', 'prediction_loss_only': False, 'per_device_train_batch_size': 8, 'per_device_eval_batch_size': 8, 'per_gpu_train_batch_size': 'None', 'per_gpu_eval_batch_size': 'None', 'gradient_accumulation_steps': 1, 'eval_accumulation_steps': 'None', 'learning_rate': 5e-05, 'weight_decay': 0.01, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'num_train_epochs': 3, 'max_steps': -1, 'lr_scheduler_type': 'linear', 'warmup_ratio': 0.0, 'warmup_steps': 300, 'log_level': -1, 'log_level_replica': -1, 'log_on_each_node': True, 'logging_dir': '/opt/ml/logs', 'logging_strategy': 'steps', 'logging_first_step': False, 'logging_steps': 500, 'save_strategy': 'steps', 'save_steps': 500, 'save_total_limit': 5, 'save_on_each_node': False, 'no_cuda': False, 'seed': 42, 'fp16': False, 'fp16_opt_level': 'O1', 'fp16_backend': 'auto', 'fp16_full_eval': False, 'local_rank': -1, 'tpu_num_cores': 'None', 'tpu_metrics_debug': False, 'debug': '[]', 'dataloader_drop_last': False, 'eval_steps': 500, 'dataloader_num_workers': 4, 'past_index': -1, 'run_name': 'add_lstm', 'disable_tqdm': False, 'remove_unused_columns': True, 'label_names': 'None', 'load_best_model_at_end': True, 'metric_for_best_model': 'f1', 'greater_is_better': True, 'ignore_data_skip': False, 'sharded_ddp': '[]', 'deepspeed': 'None', 'label_smoothing_factor': 0.0, 'adafactor': False, 'group_by_length': True, 'length_column_name': 'length', 'report_to': "['wandb']", 'ddp_find_unused_parameters': 'None', 'dataloader_pin_memory': True, 'skip_memory_metrics': True, 'use_legacy_prediction_loop': False, 'push_to_hub': False, 'resume_from_checkpoint': 'None', 'push_to_hub_model_id': 'results', 'push_to_hub_organization': 'None', 'push_to_hub_token': '<PUSH_TO_HUB_TOKEN>', '_n_gpu': 1, 'mp_parameters': '', 'train_batch_size': 8, 'eval_batch_size': 8}
+2021-10-07 04:07:41,507 INFO    MainThread:1551 [wandb_watch.py:watch():43] Watching
+2021-10-07 04:11:33,079 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:11:33,079 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:14:04,157 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:14:04,172 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:14:04,172 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:16:47,753 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:17:01,427 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:17:01,427 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:17:04,957 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:17:04,966 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:17:04,966 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:47,714 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:20:47,715 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:20:47,717 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:51,403 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:20:51,407 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:20:51,409 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:52,573 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:20:52,574 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:20:52,575 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:52,891 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:20:52,894 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:20:52,896 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:53,834 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:20:53,836 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:20:53,837 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:54,284 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:20:54,285 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:20:54,285 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:54,607 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:20:54,855 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:20:54,855 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:20:55,082 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:21:09,321 INFO    MainThread:1551 [wandb_run.py:_config_callback():878] config_cb None None {'output_dir': '/opt/ml/results', 'overwrite_output_dir': False, 'do_train': False, 'do_eval': True, 'do_predict': False, 'evaluation_strategy': 'steps', 'prediction_loss_only': False, 'per_device_train_batch_size': 8, 'per_device_eval_batch_size': 8, 'per_gpu_train_batch_size': 'None', 'per_gpu_eval_batch_size': 'None', 'gradient_accumulation_steps': 1, 'eval_accumulation_steps': 'None', 'learning_rate': 5e-05, 'weight_decay': 0.01, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'num_train_epochs': 3, 'max_steps': -1, 'lr_scheduler_type': 'linear', 'warmup_ratio': 0.0, 'warmup_steps': 300, 'log_level': -1, 'log_level_replica': -1, 'log_on_each_node': True, 'logging_dir': '/opt/ml/logs', 'logging_strategy': 'steps', 'logging_first_step': False, 'logging_steps': 500, 'save_strategy': 'steps', 'save_steps': 500, 'save_total_limit': 5, 'save_on_each_node': False, 'no_cuda': False, 'seed': 42, 'fp16': False, 'fp16_opt_level': 'O1', 'fp16_backend': 'auto', 'fp16_full_eval': False, 'local_rank': -1, 'tpu_num_cores': 'None', 'tpu_metrics_debug': False, 'debug': '[]', 'dataloader_drop_last': False, 'eval_steps': 500, 'dataloader_num_workers': 4, 'past_index': -1, 'run_name': 'add_lstm', 'disable_tqdm': False, 'remove_unused_columns': True, 'label_names': 'None', 'load_best_model_at_end': True, 'metric_for_best_model': 'f1', 'greater_is_better': True, 'ignore_data_skip': False, 'sharded_ddp': '[]', 'deepspeed': 'None', 'label_smoothing_factor': 0.0, 'adafactor': False, 'group_by_length': True, 'length_column_name': 'length', 'report_to': "['wandb']", 'ddp_find_unused_parameters': 'None', 'dataloader_pin_memory': True, 'skip_memory_metrics': True, 'use_legacy_prediction_loop': False, 'push_to_hub': False, 'resume_from_checkpoint': 'None', 'push_to_hub_model_id': 'results', 'push_to_hub_organization': 'None', 'push_to_hub_token': '<PUSH_TO_HUB_TOKEN>', '_n_gpu': 1, 'mp_parameters': '', 'train_batch_size': 8, 'eval_batch_size': 8}
+2021-10-07 04:21:09,323 INFO    MainThread:1551 [wandb_watch.py:watch():43] Watching
+2021-10-07 04:21:09,793 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:21:09,793 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:22:12,780 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:22:12,782 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:22:12,783 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:05,380 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:05,381 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:05,382 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:08,755 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:08,758 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:08,758 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:09,879 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:09,880 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:09,880 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:10,345 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:10,346 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:10,347 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:11,368 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:11,369 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:11,369 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:11,648 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:11,649 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:11,650 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:11,913 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:12,168 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:12,168 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:12,513 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:26,957 INFO    MainThread:1551 [wandb_run.py:_config_callback():878] config_cb None None {'output_dir': '/opt/ml/results', 'overwrite_output_dir': False, 'do_train': False, 'do_eval': True, 'do_predict': False, 'evaluation_strategy': 'steps', 'prediction_loss_only': False, 'per_device_train_batch_size': 8, 'per_device_eval_batch_size': 8, 'per_gpu_train_batch_size': 'None', 'per_gpu_eval_batch_size': 'None', 'gradient_accumulation_steps': 1, 'eval_accumulation_steps': 'None', 'learning_rate': 5e-05, 'weight_decay': 0.01, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'num_train_epochs': 3, 'max_steps': -1, 'lr_scheduler_type': 'linear', 'warmup_ratio': 0.0, 'warmup_steps': 300, 'log_level': -1, 'log_level_replica': -1, 'log_on_each_node': True, 'logging_dir': '/opt/ml/logs', 'logging_strategy': 'steps', 'logging_first_step': False, 'logging_steps': 500, 'save_strategy': 'steps', 'save_steps': 500, 'save_total_limit': 5, 'save_on_each_node': False, 'no_cuda': False, 'seed': 42, 'fp16': False, 'fp16_opt_level': 'O1', 'fp16_backend': 'auto', 'fp16_full_eval': False, 'local_rank': -1, 'tpu_num_cores': 'None', 'tpu_metrics_debug': False, 'debug': '[]', 'dataloader_drop_last': False, 'eval_steps': 500, 'dataloader_num_workers': 4, 'past_index': -1, 'run_name': 'add_lstm', 'disable_tqdm': False, 'remove_unused_columns': True, 'label_names': 'None', 'load_best_model_at_end': True, 'metric_for_best_model': 'f1', 'greater_is_better': True, 'ignore_data_skip': False, 'sharded_ddp': '[]', 'deepspeed': 'None', 'label_smoothing_factor': 0.0, 'adafactor': False, 'group_by_length': True, 'length_column_name': 'length', 'report_to': "['wandb']", 'ddp_find_unused_parameters': 'None', 'dataloader_pin_memory': True, 'skip_memory_metrics': True, 'use_legacy_prediction_loop': False, 'push_to_hub': False, 'resume_from_checkpoint': 'None', 'push_to_hub_model_id': 'results', 'push_to_hub_organization': 'None', 'push_to_hub_token': '<PUSH_TO_HUB_TOKEN>', '_n_gpu': 1, 'mp_parameters': '', 'train_batch_size': 8, 'eval_batch_size': 8}
+2021-10-07 04:23:26,959 INFO    MainThread:1551 [wandb_watch.py:watch():43] Watching
+2021-10-07 04:23:27,459 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:27,459 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:52,689 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:52,690 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:52,691 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:56,425 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:56,428 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:56,429 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:56,713 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:56,714 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:56,714 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:23:59,813 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:23:59,814 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:23:59,814 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:24:02,998 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:24:02,999 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:24:03,008 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:24:03,679 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:24:03,941 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:24:03,941 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:24:04,149 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:24:19,286 INFO    MainThread:1551 [wandb_run.py:_config_callback():878] config_cb None None {'output_dir': '/opt/ml/results', 'overwrite_output_dir': False, 'do_train': False, 'do_eval': True, 'do_predict': False, 'evaluation_strategy': 'steps', 'prediction_loss_only': False, 'per_device_train_batch_size': 8, 'per_device_eval_batch_size': 8, 'per_gpu_train_batch_size': 'None', 'per_gpu_eval_batch_size': 'None', 'gradient_accumulation_steps': 1, 'eval_accumulation_steps': 'None', 'learning_rate': 5e-05, 'weight_decay': 0.01, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'num_train_epochs': 3, 'max_steps': -1, 'lr_scheduler_type': 'linear', 'warmup_ratio': 0.0, 'warmup_steps': 300, 'log_level': -1, 'log_level_replica': -1, 'log_on_each_node': True, 'logging_dir': '/opt/ml/logs', 'logging_strategy': 'steps', 'logging_first_step': False, 'logging_steps': 500, 'save_strategy': 'steps', 'save_steps': 500, 'save_total_limit': 5, 'save_on_each_node': False, 'no_cuda': False, 'seed': 42, 'fp16': False, 'fp16_opt_level': 'O1', 'fp16_backend': 'auto', 'fp16_full_eval': False, 'local_rank': -1, 'tpu_num_cores': 'None', 'tpu_metrics_debug': False, 'debug': '[]', 'dataloader_drop_last': False, 'eval_steps': 500, 'dataloader_num_workers': 4, 'past_index': -1, 'run_name': 'add_lstm', 'disable_tqdm': False, 'remove_unused_columns': True, 'label_names': 'None', 'load_best_model_at_end': True, 'metric_for_best_model': 'f1', 'greater_is_better': True, 'ignore_data_skip': False, 'sharded_ddp': '[]', 'deepspeed': 'None', 'label_smoothing_factor': 0.0, 'adafactor': False, 'group_by_length': True, 'length_column_name': 'length', 'report_to': "['wandb']", 'ddp_find_unused_parameters': 'None', 'dataloader_pin_memory': True, 'skip_memory_metrics': True, 'use_legacy_prediction_loop': False, 'push_to_hub': False, 'resume_from_checkpoint': 'None', 'push_to_hub_model_id': 'results', 'push_to_hub_organization': 'None', 'push_to_hub_token': '<PUSH_TO_HUB_TOKEN>', '_n_gpu': 1, 'mp_parameters': '', 'train_batch_size': 8, 'eval_batch_size': 8}
+2021-10-07 04:24:19,289 INFO    MainThread:1551 [wandb_watch.py:watch():43] Watching
+2021-10-07 04:24:19,895 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:24:19,895 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:37,531 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:25:37,533 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:25:37,533 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:44,257 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:25:44,261 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:25:44,261 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:46,476 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:25:46,478 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:25:46,478 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:46,891 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:25:46,893 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:25:46,893 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:47,267 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:25:47,267 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:25:47,267 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:47,628 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:25:47,629 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:25:47,630 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:47,964 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:25:48,242 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:25:48,242 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:25:48,504 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:26:02,679 INFO    MainThread:1551 [wandb_run.py:_config_callback():878] config_cb None None {'output_dir': '/opt/ml/results', 'overwrite_output_dir': False, 'do_train': False, 'do_eval': True, 'do_predict': False, 'evaluation_strategy': 'steps', 'prediction_loss_only': False, 'per_device_train_batch_size': 8, 'per_device_eval_batch_size': 8, 'per_gpu_train_batch_size': 'None', 'per_gpu_eval_batch_size': 'None', 'gradient_accumulation_steps': 1, 'eval_accumulation_steps': 'None', 'learning_rate': 5e-05, 'weight_decay': 0.01, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'num_train_epochs': 3, 'max_steps': -1, 'lr_scheduler_type': 'linear', 'warmup_ratio': 0.0, 'warmup_steps': 300, 'log_level': -1, 'log_level_replica': -1, 'log_on_each_node': True, 'logging_dir': '/opt/ml/logs', 'logging_strategy': 'steps', 'logging_first_step': False, 'logging_steps': 500, 'save_strategy': 'steps', 'save_steps': 500, 'save_total_limit': 5, 'save_on_each_node': False, 'no_cuda': False, 'seed': 42, 'fp16': False, 'fp16_opt_level': 'O1', 'fp16_backend': 'auto', 'fp16_full_eval': False, 'local_rank': -1, 'tpu_num_cores': 'None', 'tpu_metrics_debug': False, 'debug': '[]', 'dataloader_drop_last': False, 'eval_steps': 500, 'dataloader_num_workers': 4, 'past_index': -1, 'run_name': 'add_lstm', 'disable_tqdm': False, 'remove_unused_columns': True, 'label_names': 'None', 'load_best_model_at_end': True, 'metric_for_best_model': 'f1', 'greater_is_better': True, 'ignore_data_skip': False, 'sharded_ddp': '[]', 'deepspeed': 'None', 'label_smoothing_factor': 0.0, 'adafactor': False, 'group_by_length': True, 'length_column_name': 'length', 'report_to': "['wandb']", 'ddp_find_unused_parameters': 'None', 'dataloader_pin_memory': True, 'skip_memory_metrics': True, 'use_legacy_prediction_loop': False, 'push_to_hub': False, 'resume_from_checkpoint': 'None', 'push_to_hub_model_id': 'results', 'push_to_hub_organization': 'None', 'push_to_hub_token': '<PUSH_TO_HUB_TOKEN>', '_n_gpu': 1, 'mp_parameters': '', 'train_batch_size': 8, 'eval_batch_size': 8}
+2021-10-07 04:26:02,681 INFO    MainThread:1551 [wandb_watch.py:watch():43] Watching
+2021-10-07 04:28:36,426 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:28:36,426 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:29:37,299 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:29:37,322 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:29:37,322 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:29:46,481 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:29:46,496 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:29:46,496 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:29:49,765 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:29:49,788 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:29:49,788 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:29:53,070 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:29:53,086 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:29:53,086 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:29:58,700 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:29:58,703 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:29:58,703 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:30:01,783 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:30:01,796 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:30:01,796 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:30:07,474 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:30:07,489 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:30:07,489 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:30:18,776 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:30:18,789 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:30:18,789 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:30:20,991 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:30:20,993 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:30:20,994 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:39:55,191 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:39:55,194 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:39:55,194 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:39:57,494 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:39:57,496 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:39:57,496 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:39:59,227 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:39:59,228 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:39:59,229 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:01,933 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:01,935 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:01,936 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:20,883 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:20,885 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:20,885 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:26,317 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:26,320 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:26,321 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:27,558 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:27,559 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:27,559 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:27,905 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:27,906 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:27,906 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:28,698 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:28,699 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:28,699 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:29,454 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:29,455 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:29,455 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:29,854 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:30,121 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:40:30,121 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:40:30,853 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:40:45,174 INFO    MainThread:1551 [wandb_run.py:_config_callback():878] config_cb None None {'output_dir': '/opt/ml/results', 'overwrite_output_dir': False, 'do_train': False, 'do_eval': True, 'do_predict': False, 'evaluation_strategy': 'steps', 'prediction_loss_only': False, 'per_device_train_batch_size': 8, 'per_device_eval_batch_size': 8, 'per_gpu_train_batch_size': 'None', 'per_gpu_eval_batch_size': 'None', 'gradient_accumulation_steps': 1, 'eval_accumulation_steps': 'None', 'learning_rate': 5e-05, 'weight_decay': 0.01, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'num_train_epochs': 3, 'max_steps': -1, 'lr_scheduler_type': 'linear', 'warmup_ratio': 0.0, 'warmup_steps': 300, 'log_level': -1, 'log_level_replica': -1, 'log_on_each_node': True, 'logging_dir': '/opt/ml/logs', 'logging_strategy': 'steps', 'logging_first_step': False, 'logging_steps': 500, 'save_strategy': 'steps', 'save_steps': 500, 'save_total_limit': 5, 'save_on_each_node': False, 'no_cuda': False, 'seed': 42, 'fp16': False, 'fp16_opt_level': 'O1', 'fp16_backend': 'auto', 'fp16_full_eval': False, 'local_rank': -1, 'tpu_num_cores': 'None', 'tpu_metrics_debug': False, 'debug': '[]', 'dataloader_drop_last': False, 'eval_steps': 500, 'dataloader_num_workers': 4, 'past_index': -1, 'run_name': 'add_lstm', 'disable_tqdm': False, 'remove_unused_columns': True, 'label_names': 'None', 'load_best_model_at_end': True, 'metric_for_best_model': 'f1', 'greater_is_better': True, 'ignore_data_skip': False, 'sharded_ddp': '[]', 'deepspeed': 'None', 'label_smoothing_factor': 0.0, 'adafactor': False, 'group_by_length': True, 'length_column_name': 'length', 'report_to': "['wandb']", 'ddp_find_unused_parameters': 'None', 'dataloader_pin_memory': True, 'skip_memory_metrics': True, 'use_legacy_prediction_loop': False, 'push_to_hub': False, 'resume_from_checkpoint': 'None', 'push_to_hub_model_id': 'results', 'push_to_hub_organization': 'None', 'push_to_hub_token': '<PUSH_TO_HUB_TOKEN>', '_n_gpu': 1, 'mp_parameters': '', 'train_batch_size': 8, 'eval_batch_size': 8}
+2021-10-07 04:40:45,176 INFO    MainThread:1551 [wandb_watch.py:watch():43] Watching
+2021-10-07 04:43:18,943 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:43:18,943 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:43:46,479 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:44:00,207 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:44:00,208 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:44:59,691 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:45:13,289 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:45:13,289 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:50:27,346 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:50:27,347 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:50:27,347 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:50:28,269 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:50:31,432 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:50:31,432 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:50:59,730 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:51:07,882 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:51:07,882 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:51:08,438 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:51:11,518 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:51:11,518 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
+2021-10-07 04:51:20,236 INFO    MainThread:1551 [wandb_init.py:_resume_backend():279] resuming backend
+2021-10-07 04:51:23,277 INFO    MainThread:1551 [wandb_init.py:_pause_backend():270] pausing backend
+2021-10-07 04:51:23,278 INFO    MainThread:1551 [jupyter.py:save_ipynb():373] not saving jupyter notebook
