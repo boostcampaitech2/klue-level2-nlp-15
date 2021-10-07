@@ -294,3 +294,9 @@
 2021-10-07 04:51:20,241 INFO    HandlerThread:1675 [handler.py:handle_request_resume():558] starting system metrics thread
 2021-10-07 04:51:23,279 DEBUG   HandlerThread:1675 [handler.py:handle_request():126] handle_request: pause
 2021-10-07 04:51:23,279 INFO    HandlerThread:1675 [handler.py:handle_request_pause():567] stopping system metrics thread
+2021-10-07 06:09:30,585 WARNING MainThread:1675 [internal.py:is_dead():364] Internal process exiting, parent pid 1551 disappeared
+2021-10-07 06:09:30,585 ERROR   MainThread:1675 [internal.py:wandb_internal():141] Internal process shutdown.
+2021-10-07 06:09:30,700 INFO    HandlerThread:1675 [handler.py:finish():683] shutting down handler
+2021-10-07 06:09:31,159 INFO    WriterThread:1675 [datastore.py:close():281] close: /opt/ml/klue-level2-nlp-15/wandb/offline-run-20211007_040648-2fcm3utd/run-2fcm3utd.wandb
+2021-10-07 06:09:31,175 INFO    SenderThread:1675 [sender.py:finish():986] shutting down sender
+2021-10-07 06:09:31,176 INFO    MainThread:1675 [internal.py:handle_exit():76] Internal process exited
