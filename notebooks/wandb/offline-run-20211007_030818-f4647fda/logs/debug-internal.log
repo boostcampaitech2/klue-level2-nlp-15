@@ -1,0 +1,15 @@
+2021-10-07 03:08:19,978 INFO    MainThread:3065 [internal.py:wandb_internal():86] W&B internal server running at pid: 3065, started at: 2021-10-07 03:08:19.978411
+2021-10-07 03:08:19,981 INFO    WriterThread:3065 [datastore.py:open_for_write():77] open: /opt/ml/klue-level2-nlp-15/notebooks/wandb/offline-run-20211007_030818-f4647fda/run-f4647fda.wandb
+2021-10-07 03:08:19,981 DEBUG   HandlerThread:3065 [handler.py:handle_request():126] handle_request: run_start
+2021-10-07 03:08:21,504 DEBUG   HandlerThread:3065 [meta.py:__init__():40] meta init
+2021-10-07 03:08:21,505 DEBUG   HandlerThread:3065 [meta.py:__init__():54] meta init done
+2021-10-07 03:08:21,505 DEBUG   HandlerThread:3065 [meta.py:probe():211] probe
+2021-10-07 03:08:21,511 DEBUG   HandlerThread:3065 [meta.py:_setup_git():201] setup git
+2021-10-07 03:08:21,540 DEBUG   HandlerThread:3065 [meta.py:_setup_git():208] setup git done
+2021-10-07 03:08:21,540 DEBUG   HandlerThread:3065 [meta.py:_save_pip():58] save pip
+2021-10-07 03:08:21,541 DEBUG   HandlerThread:3065 [meta.py:_save_pip():72] save pip done
+2021-10-07 03:08:21,541 DEBUG   HandlerThread:3065 [meta.py:_save_conda():79] save conda
+2021-10-07 03:08:27,985 DEBUG   HandlerThread:3065 [meta.py:_save_conda():87] save conda done
+2021-10-07 03:08:27,985 DEBUG   HandlerThread:3065 [meta.py:probe():249] probe done
+2021-10-07 03:08:27,989 DEBUG   HandlerThread:3065 [handler.py:handle_request():126] handle_request: pause
+2021-10-07 03:08:27,989 INFO    HandlerThread:3065 [handler.py:handle_request_pause():567] stopping system metrics thread
