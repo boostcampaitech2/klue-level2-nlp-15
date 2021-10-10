@@ -1,7 +1,7 @@
 import torch
 from torch.cuda.amp import autocast
 import torch.nn as nn
-from transformers import AutoModel,AutoConfig
+from transformers import AutoModel, AutoConfig
 from utils.loss import FocalLoss
 
 
@@ -112,6 +112,7 @@ class StartTokenWithCLSModel(torch.nn.Module):
 
         out = self.classifier(stack)
         return out
+
 
 class RBERT(nn.Module):
     def __init__(
