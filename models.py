@@ -1,4 +1,5 @@
 import torch
+from torch import nn
 from torch.cuda.amp import autocast
 import torch.nn as nn
 from transformers import AutoModel, AutoConfig
@@ -114,11 +115,27 @@ class StartTokenWithCLSModel(torch.nn.Module):
         return out
 
 
+class FCLayer(nn.Module):
+    def __init__(self, input_dim, output_dim, dropout_rate=0.0, use_activation=True):
+        super(FCLayer, self).__init__()
+        self.use_activation = use_activation
+        self.dropout = nn.Dropout(dropout_rate)
+        self.linear = nn.Linear(input_dim, output_dim)
+        self.tanh = nn.Tanh()
+
+    def forward(self, x):
+        x = self.dropout(x)
+        if self.use_activation:
+            x = self.tanh(x)
+        return self.linear(x)
+
+
 class RBERT(nn.Module):
+    """R-BERT: https://github.com/monologg/R-BERT"""
+
     def __init__(
         self,
         model_name: str = "klue/roberta-large",
-        vocab_size=30000,
         num_labels: int = 30,
         dropout_rate: float = 0.1,
         special_tokens_dict: dict = None,
@@ -208,3 +225,18 @@ class RBERT(nn.Module):
         concat_h = torch.cat([pooled_output, e1_h, e2_h], dim=-1)
         logits = self.label_classifier(concat_h)
         return logits
+
+        # WILL USE FOCAL LOSS INSTEAD OF MSELoss and CrossEntropyLoss
+        # outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
+        # # Softmax
+        # if labels is not None:
+        #     if self.num_labels == 1:
+        #         loss_fct = nn.MSELoss()
+        #         loss = loss_fct(logits.view(-1), labels.view(-1))
+        #     else:
+        #         loss_fct = nn.CrossEntropyLoss()
+        #         loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
+
+        #     outputs = (loss,) + outputs
+
+        #  return outputs  # (loss), logits, (hidden_states), (attentions)
