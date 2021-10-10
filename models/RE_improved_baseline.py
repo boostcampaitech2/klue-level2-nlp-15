@@ -8,7 +8,9 @@ from utils.loss import FocalLoss
 
 class IBModel(nn.Module):
     '''
-    Model implementation 
+    Model implementation of paper: 'An Improved Baseline for Sentence-level Relation Extraction'
+    with some customizations added to match the performance on KLUE RE task
+    https://arxiv.org/abs/2102.01373
     '''
     def __init__(self, model_name, config):
         super().__init__()

@@ -46,6 +46,8 @@ def tokenized_dataset(dataset, tokenizer):
 
     <<An Improved Baseline for Sentence-level Relation Extraction>>
 
+    returns: input_ids, subject start & end positions, object start & end positions
+
     """
 
     type_dict = {
@@ -91,9 +93,9 @@ def tokenized_dataset(dataset, tokenizer):
 
 
 def collate_fn(batch):
-    ''' 각 batch안에서
-    max_len = max([len(f['input_ids'] for f in batch])식으로
-    맞추려고 했는데 잘 안되서 일단 max_len 상수값으로 지정
+    '''
+    Retrieving the input_ids, input_mask, labels, subject and object start positions
+    for IB model
     '''
     max_len = 256
     input_ids = [f["input_ids"] + [1] * (max_len - len(f["input_ids"])) for f in batch]
