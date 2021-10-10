@@ -515,7 +515,7 @@ def pull_out_dictionary(df_input: pd.DataFrame):
     return df
 
 
-class RE_Dataset_concat(torch.utils.data.Dataset):
+class RE_Dataset(torch.utils.data.Dataset):
     """ Dataset 구성을 위한 class."""
 
     def __init__(self, pair_dataset, labels):
