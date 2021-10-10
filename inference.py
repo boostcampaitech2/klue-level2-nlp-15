@@ -113,11 +113,10 @@ def inference_ib(config):
 def inference_rbert():
 
     test_dataset = pd.read_csv(PORORO_TEST_PATH)
-    display(test_dataset.head(2))
     # test_dataset = test_dataset.drop(test_dataset.columns[0], axis=1)
     test_dataset["label"] = 100
     print(len(test_dataset))
-    test_set = CustomDataset(test_dataset, tokenizer, is_training=False)
+    test_set = RBERT_Dataset(test_dataset, tokenizer, is_training=False)
     print(len(test_set))
     test_data_loader = DataLoader(
         test_set, batch_size=CFG.batch_size, num_workers=CFG.num_workers, shuffle=False
@@ -170,65 +169,76 @@ def inference_rbert():
     )
     df_submission.to_csv("./prediction/submission_RBERT.csv", index=False)
 
+
 def inference_concat(config):
     MODEL_NAME = config["Concat"]["pretrained_model_name"]
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     PORORO_TEST_PATH = config["data"]["pororo_test_path"]
     test_dataset = pd.read_csv(PORORO_TEST_PATH)
-    test_dataset['label'] = 100
-    test_label = list(map(int, test_dataset['label'].values))
+    test_dataset["label"] = 100
+    test_label = list(map(int, test_dataset["label"].values))
     tokenized_test = tokenized_dataset(test_dataset, tokenizer)
-    test_id = test_dataset['id']
-    Re_test_dataset = RE_Dataset_concat(tokenized_test ,test_label) 
+    test_id = test_dataset["id"]
+    Re_test_dataset = RE_Dataset_concat(tokenized_test, test_label)
 
     dataloader = DataLoader(Re_test_dataset, batch_size=32, shuffle=False)
     special_token_list = []
-    with open(config["data"]["pororo_test_path"]["pororo_special_token_path"], 'r', encoding = 'UTF-8') as f :
-        for token in f :
-            special_token_list.append(token.split('\n')[0])
+    with open(
+        config["data"]["pororo_test_path"]["pororo_special_token_path"],
+        "r",
+        encoding="UTF-8",
+    ) as f:
+        for token in f:
+            special_token_list.append(token.split("\n")[0])
 
     # ./best_model/fold_{fold}
     oof_pred = None
-    for i in range(5) :
-        model_name = config["data"]["saved_model_dir"] + f'/fold_{i}'
+    oof_pred = None
+    for i in range(5):
+        model_name = config["data"]["saved_model_dir"] + f"/fold_{i}"
         model = AutoModelForSequenceClassification.from_pretrained(model_name)
-        added_token_num = tokenizer.add_special_tokens({"additional_special_tokens":list(set(special_token_list))})
+        added_token_num = tokenizer.add_special_tokens(
+            {"additional_special_tokens": list(set(special_token_list))}
+        )
         model.resize_token_embeddings(tokenizer.vocab_size + added_token_num)
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         model.to(device)
         model.eval()
 
         output_pred = []
-        for i, data in enumerate(tqdm(dataloader)) :
-            with torch.no_grad() :
+        for i, data in enumerate(tqdm(dataloader)):
+            with torch.no_grad():
                 outputs = model(
-                    input_ids=data['input_ids'].to(device),
-                    attention_mask=data['attention_mask'].to(device),
-                    token_type_ids=data['token_type_ids'].to(device)
-                    )
+                    input_ids=data["input_ids"].to(device),
+                    attention_mask=data["attention_mask"].to(device),
+                    token_type_ids=data["token_type_ids"].to(device),
+                )
             logits = outputs[0]
-            prob = F.softmax(logits, dim = -1).detach().cpu().numpy()
+            prob = F.softmax(logits, dim=-1).detach().cpu().numpy()
             output_pred.append(prob)
-        final_prob = np.concatenate(output_pred, axis = 0)
+        final_prob = np.concatenate(output_pred, axis=0)
 
-        if oof_pred is None :
+        if oof_pred is None:
             oof_pred = final_prob / 5
-        else :
+        else:
             oof_pred += final_prob / 5
 
-    result = np.argmax(oof_pred, axis = -1)
+    result = np.argmax(oof_pred, axis=-1)
     pred_answer = num_to_label(result)
     output_prob = oof_pred.tolist()
 
-    output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
-    output.to_csv('./prediction/submission_concat.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.    
+    output = pd.DataFrame(
+        {
+            "id": test_id,
+            "pred_label": pred_answer,
+            "probs": output_prob,
+        }
+    )
+    output.to_csv(
+        "./prediction/submission_concat.csv", index=False
+    )  # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
+
 
 def main():
-    config = ''
-    with open('.\config.yaml', 'r') as f:
-        config = yaml.load(f)
-    
-    inference_concat(config) 
-    inference_ib(config)
-
+    inference_ib()
