@@ -15,11 +15,23 @@ from models import *
 import yaml
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DATA_CFG = {}
+IB_CFG = {}
+RBERT_CFG = {}
+CONCAT_CFG = {}
 
+# Read config.yaml file
+with open("config.yaml") as infile:
+    SAVED_CFG = yaml.load(infile, Loader=yaml.FullLoader)
+
+DATA_CFG = SAVED_CFG["data"]
+IB_CFG = SAVED_CFG["IB"]
+RBERT_CFG = SAVED_CFG["RBERT"]
+CONCAT_CFG = SAVED_CFG["Concat"]
 
 def num_to_label(label):
     origin_label = []
-    with open("./code/dict_label_to_num.pkl", "rb") as f:
+    with open("data/dict_label_to_num.pkl", "rb") as f:
         dict_num_to_label = pickle.load(f)
     new_dict = {value: key for key, value in dict_num_to_label.items()}
     for v in label:
@@ -61,16 +73,16 @@ def load_test_dataset_for_ib(dataset_dir, tokenizer):
     return test_dataset["id"], test_features
 
 
-def inference_ib(config):
+def inference_ib():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    Tokenizer_NAME = config["IB"]["pretrained_model_name"]
+    Tokenizer_NAME = IB_CFG["pretrained_model_name"]
     tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
     for fold_num in range(5):
         MODEL_NAME = f"./re_finetuned/fold_ensemble/roberta_focal_adamp{fold_num}.pt'"
         model = torch.load(MODEL_NAME)
         model.parameters
         model.to(device)
-        test_dataset_dir = config["data"]["test_file_path"]
+        test_dataset_dir = DATA_CFG["test_file_path"]
         test_id, test_features = load_test_dataset_for_ib(test_dataset_dir, tokenizer)
         pred_answer, output_prob = inference_for_ib(model, test_features, device)
         pred_answer = num_to_label(pred_answer)
@@ -101,7 +113,7 @@ def inference_ib(config):
     predsss = num_to_label(pred_answer)
 
     avr_total = avr_total.tolist()
-    test_file = config["data"]["test_file_path"]
+    test_file = DATA_CFG["test_file_path"]
     test_ids = test_file["id"].tolist()
     output = pd.DataFrame(
         {"id": test_ids, "pred_label": predsss, "probs": avr_total},
@@ -112,21 +124,32 @@ def inference_ib(config):
 
 def inference_rbert():
 
+    PORORO_TEST_PATH = DATA_CFG["pororo_test_path"]
     test_dataset = pd.read_csv(PORORO_TEST_PATH)
     # test_dataset = test_dataset.drop(test_dataset.columns[0], axis=1)
     test_dataset["label"] = 100
     print(len(test_dataset))
+    MODEL_NAME = RBERT_CFG["pretrained_model_name"]
+
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+    special_token_list = []
+    with open(DATA_CFG["pororo_special_token_path"], 'r', encoding = 'UTF-8') as f :
+        for token in f :
+            special_token_list.append(token.split('\n')[0])
+
+    added_token_num = tokenizer.add_special_tokens({"additional_special_tokens":list(set(special_token_list))})    
     test_set = RBERT_Dataset(test_dataset, tokenizer, is_training=False)
     print(len(test_set))
     test_data_loader = DataLoader(
-        test_set, batch_size=CFG.batch_size, num_workers=CFG.num_workers, shuffle=False
+        test_set, batch_size=RBERT_CFG["batch_size"], num_workers=RBERT_CFG["num_workers"], shuffle=False
     )
     oof_pred = []  # out of fold prediction list
     for i in range(5):
         model_path = "/opt/ml/klue-level2-nlp-15/notebooks/results/{}-fold-5-best-eval-loss-model.pt".format(
             i + 1
         )
-        model = RBERT(CFG.model_name, dropout_rate=CFG.dropout_rate)
+        model = RBERT(RBERT_CFG["pretrained_model_name"], dropout_rate=RBERT_CFG["dropout_rate"])
         model.load_state_dict(torch.load(model_path))
         model.to(device)
         model.eval()
@@ -170,11 +193,11 @@ def inference_rbert():
     df_submission.to_csv("./prediction/submission_RBERT.csv", index=False)
 
 
-def inference_concat(config):
-    MODEL_NAME = config["Concat"]["pretrained_model_name"]
+def inference_concat():
+    MODEL_NAME = CONCAT_CFG["pretrained_model_name"]
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-    PORORO_TEST_PATH = config["data"]["pororo_test_path"]
+    PORORO_TEST_PATH = DATA_CFG["pororo_test_path"]
     test_dataset = pd.read_csv(PORORO_TEST_PATH)
     test_dataset["label"] = 100
     test_label = list(map(int, test_dataset["label"].values))
@@ -185,7 +208,7 @@ def inference_concat(config):
     dataloader = DataLoader(Re_test_dataset, batch_size=32, shuffle=False)
     special_token_list = []
     with open(
-        config["data"]["pororo_test_path"]["pororo_special_token_path"],
+        DATA_CFG["pororo_special_token_path"],
         "r",
         encoding="UTF-8",
     ) as f:
@@ -196,7 +219,7 @@ def inference_concat(config):
     oof_pred = None
     oof_pred = None
     for i in range(5):
-        model_name = config["data"]["saved_model_dir"] + f"/fold_{i}"
+        model_name = DATA_CFG["saved_model_dir"] + f"/fold_{i}"
         model = AutoModelForSequenceClassification.from_pretrained(model_name)
         added_token_num = tokenizer.add_special_tokens(
             {"additional_special_tokens": list(set(special_token_list))}
