@@ -1,10 +1,16 @@
 from transformers import AutoTokenizer
+
+# import dataset wrangler
+import numpy as np
+import pandas as pd
+
 from tqdm import tqdm
 from dataloader.ib_dataset import *
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset, Subset
 from utils.metrics import *
 import torch.nn.functional as F
 import os
+from models import *
 
 
 def num_to_label(label):
@@ -98,6 +104,67 @@ def inference_ib():
     )
     output.to_csv("./prediction/ib_output.csv", index=False)
     print("---- Finished creating Final ensembled file for all folds! ----")
+
+
+def inference_rbert():
+
+    test_dataset = pd.read_csv(PORORO_TEST_PATH)
+    display(test_dataset.head(2))
+    # test_dataset = test_dataset.drop(test_dataset.columns[0], axis=1)
+    test_dataset["label"] = 100
+    print(len(test_dataset))
+    test_set = CustomDataset(test_dataset, tokenizer, is_training=False)
+    print(len(test_set))
+    test_data_loader = DataLoader(
+        test_set, batch_size=CFG.batch_size, num_workers=CFG.num_workers, shuffle=False
+    )
+    oof_pred = []  # out of fold prediction list
+    for i in range(5):
+        model_path = "/opt/ml/klue-level2-nlp-15/notebooks/results/{}-fold-5-best-eval-loss-model.pt".format(
+            i + 1
+        )
+        model = RBERT(CFG.model_name, dropout_rate=CFG.dropout_rate)
+        model.load_state_dict(torch.load(model_path))
+        model.to(device)
+        model.eval()
+
+        output_pred = []
+        for i, data in enumerate(tqdm(test_data_loader)):
+            with torch.no_grad():
+                outputs = model(
+                    input_ids=data["input_ids"].to(device),
+                    attention_mask=data["attention_mask"].to(device),
+                    subject_mask=data["subject_mask"].to(device),
+                    object_mask=data["object_mask"].to(device),
+                    # token_type_ids=data['token_type_ids'].to(device) # RoBERTa does not use token_type_ids.
+                )
+            output_pred.extend(outputs.cpu().detach().numpy())
+        output_pred = F.softmax(torch.Tensor(output_pred), dim=1)
+        oof_pred.append(np.array(output_pred)[:, np.newaxis])
+
+        # Prevent OOM error
+        model.cpu()
+        del model
+        torch.cuda.empty_cache()
+
+    models_prob = np.mean(
+        np.concatenate(oof_pred, axis=2), axis=2
+    )  # probability of each class
+    result = np.argmax(models_prob, axis=-1)  # label
+    # print(result, type(result))
+    # print(models_prob.shape, list_prob)
+
+    list_prob = models_prob.tolist()
+
+    test_id = test_dataset["id"]
+    df_submission = pd.DataFrame(
+        {
+            "id": test_id,
+            "pred_label": num_to_label(result),
+            "probs": list_prob,
+        }
+    )
+    df_submission.to_csv("./prediction/submission_RBERT.csv", index=False)
 
 
 def main():
