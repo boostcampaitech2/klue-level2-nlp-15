@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 # import dataset wrangler
 import numpy as np
@@ -9,6 +9,7 @@ from dataloader.ib_dataset import *
 from torch.utils.data import DataLoader, Dataset, Subset
 from utils.metrics import *
 import torch.nn.functional as F
+from dataset import *
 import os
 from models import *
 
@@ -166,6 +167,58 @@ def inference_rbert():
     )
     df_submission.to_csv("./prediction/submission_RBERT.csv", index=False)
 
+def inference_concat():
+    MODEL_NAME = 'klue/bert-base'
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+    test_dataset = pd.read_csv(PORORO_TEST_PATH)
+    test_dataset['label'] = 100
+    test_label = list(map(int, test_dataset['label'].values))
+    tokenized_test = tokenized_dataset(test_dataset, tokenizer)
+    test_id = test_dataset['id']
+    Re_test_dataset = RE_Dataset_concat(tokenized_test ,test_label) 
+
+    dataloader = DataLoader(Re_test_dataset, batch_size=32, shuffle=False)
+    special_token_list = []
+    with open('./dataset/pororo_special_token.txt', 'r', encoding = 'UTF-8') as f :
+        for token in f :
+            special_token_list.append(token.split('\n')[0])
+
+    # ./best_model/fold_{fold}
+    oof_pred = None
+    for i in range(5) :
+        model_name = './best_model/fold_{i}'.format(i)
+        model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        added_token_num = tokenizer.add_special_tokens({"additional_special_tokens":list(set(special_token_list))})
+        model.resize_token_embeddings(tokenizer.vocab_size + added_token_num)
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        model.to(device)
+        model.eval()
+
+        output_pred = []
+        for i, data in enumerate(tqdm(dataloader)) :
+            with torch.no_grad() :
+                outputs = model(
+                    input_ids=data['input_ids'].to(device),
+                    attention_mask=data['attention_mask'].to(device),
+                    token_type_ids=data['token_type_ids'].to(device)
+                    )
+            logits = outputs[0]
+            prob = F.softmax(logits, dim = -1).detach().cpu().numpy()
+            output_pred.append(prob)
+        final_prob = np.concatenate(output_pred, axis = 0)
+
+        if oof_pred is None :
+            oof_pred = final_prob / 5
+        else :
+            oof_pred += final_prob / 5
+
+    result = np.argmax(oof_pred, axis = -1)
+    pred_answer = num_to_label(result)
+    output_prob = oof_pred.tolist()
+
+    output = pd.DataFrame({'id':test_id,'pred_label':pred_answer,'probs':output_prob,})
+    output.to_csv('./prediction/submission_concat.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.    
 
 def main():
     inference_ib()
