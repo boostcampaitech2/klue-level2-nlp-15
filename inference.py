@@ -191,7 +191,7 @@ def inference_concat(config):
     # ./best_model/fold_{fold}
     oof_pred = None
     for i in range(5) :
-        model_name = config["data"]["saved_model_dir"] + '/fold_{i}'.format(i)
+        model_name = config["data"]["saved_model_dir"] + f'/fold_{i}'
         model = AutoModelForSequenceClassification.from_pretrained(model_name)
         added_token_num = tokenizer.add_special_tokens({"additional_special_tokens":list(set(special_token_list))})
         model.resize_token_embeddings(tokenizer.vocab_size + added_token_num)
@@ -225,9 +225,11 @@ def inference_concat(config):
     output.to_csv('./prediction/submission_concat.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.    
 
 def main():
-    # inference_ib()
     config = ''
     with open('.\config.yaml', 'r') as f:
         config = yaml.load(f)
     
-    inference_concat(config)    
+    inference_concat(config) 
+
+    # inference_ib()
+
