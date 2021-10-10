@@ -68,7 +68,6 @@ data
 │  README.md
 │  requirements.txt
 │  train.py
-|  trainer.py
 │
 ├─data
 │      dict_label_to_num.pkl
@@ -108,9 +107,6 @@ data
 - `train.py`
     - code를 학습시키기 위한 파일입니다.
     - 저장된 model관련 파일은 `results` 폴더에 있습니다.
-    
-- `trainer.py`
-    - Model별 config를 불러온다.
 
 - `inference.py`
     - 학습된 model을 통해 prediction하며, 예측한 결과를 csv 파일로 저장해줍니다.
