@@ -5,13 +5,16 @@ import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
-from dataloader.ib_dataset import *
+from dataset import *
 from torch.utils.data import DataLoader, Dataset, Subset
 from utils.metrics import *
 import torch.nn.functional as F
 from dataset import *
 import os
 from models import *
+import yaml
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def num_to_label(label):
@@ -167,10 +170,11 @@ def inference_rbert():
     )
     df_submission.to_csv("./prediction/submission_RBERT.csv", index=False)
 
-def inference_concat():
-    MODEL_NAME = 'klue/bert-base'
+def inference_concat(config):
+    MODEL_NAME = config["Concat"]["pretrained_model_name"]
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
+    PORORO_TEST_PATH = config["data"]["pororo_test_path"]
     test_dataset = pd.read_csv(PORORO_TEST_PATH)
     test_dataset['label'] = 100
     test_label = list(map(int, test_dataset['label'].values))
@@ -180,14 +184,14 @@ def inference_concat():
 
     dataloader = DataLoader(Re_test_dataset, batch_size=32, shuffle=False)
     special_token_list = []
-    with open('./data/pororo_special_token.txt', 'r', encoding = 'UTF-8') as f :
+    with open(config["data"]["pororo_test_path"]["pororo_special_token_path"], 'r', encoding = 'UTF-8') as f :
         for token in f :
             special_token_list.append(token.split('\n')[0])
 
     # ./best_model/fold_{fold}
     oof_pred = None
     for i in range(5) :
-        model_name = './best_model/fold_{i}'.format(i)
+        model_name = config["data"]["saved_model_dir"] + '/fold_{i}'.format(i)
         model = AutoModelForSequenceClassification.from_pretrained(model_name)
         added_token_num = tokenizer.add_special_tokens({"additional_special_tokens":list(set(special_token_list))})
         model.resize_token_embeddings(tokenizer.vocab_size + added_token_num)
@@ -221,4 +225,9 @@ def inference_concat():
     output.to_csv('./prediction/submission_concat.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.    
 
 def main():
-    inference_ib()
+    # inference_ib()
+    config = ''
+    with open('.\config.yaml', 'r') as f:
+        config = yaml.load(f)
+    
+    inference_concat(config)    
