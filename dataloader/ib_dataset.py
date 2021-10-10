@@ -40,14 +40,11 @@ def load_data(dataset_dir):
 
 def tokenized_dataset(dataset, tokenizer):
     """
-    각 문장에 typed entity marker를 끼워줍니다.
-    entity type는 한국어모델에 맞게 한 토큰으로
-    토크나이징되는 단얼로 대체 (e.g. "PER" -> "사람")
+    Inserting typed entity markers to each sentences
     subject: @*type*subject word@ (e.g.  김현수 -> @*사람*김현수@)
     object: #^type^object word# (e.g. #^지명^한국#)
 
     <<An Improved Baseline for Sentence-level Relation Extraction>>
-    논문에서 각 entity marker의 시작위치 (ss, es)를 사용하기 때문에 함께 반환해줌
 
     """
 
