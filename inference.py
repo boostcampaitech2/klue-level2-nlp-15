@@ -180,7 +180,7 @@ def inference_concat():
 
     dataloader = DataLoader(Re_test_dataset, batch_size=32, shuffle=False)
     special_token_list = []
-    with open('./dataset/pororo_special_token.txt', 'r', encoding = 'UTF-8') as f :
+    with open('./data/pororo_special_token.txt', 'r', encoding = 'UTF-8') as f :
         for token in f :
             special_token_list.append(token.split('\n')[0])
 
