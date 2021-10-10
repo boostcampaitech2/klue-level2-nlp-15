@@ -61,16 +61,16 @@ def load_test_dataset_for_ib(dataset_dir, tokenizer):
     return test_dataset["id"], test_features
 
 
-def inference_ib():
+def inference_ib(config):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    Tokenizer_NAME = "klue/roberta-large"
+    Tokenizer_NAME = config["IB"]["pretrained_model_name"]
     tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
     for fold_num in range(5):
         MODEL_NAME = f"./re_finetuned/fold_ensemble/roberta_focal_adamp{fold_num}.pt'"
         model = torch.load(MODEL_NAME)
         model.parameters
         model.to(device)
-        test_dataset_dir = "./dataset/test/test_data.csv"
+        test_dataset_dir = config["data"]["test_file_path"]
         test_id, test_features = load_test_dataset_for_ib(test_dataset_dir, tokenizer)
         pred_answer, output_prob = inference_for_ib(model, test_features, device)
         pred_answer = num_to_label(pred_answer)
@@ -101,7 +101,7 @@ def inference_ib():
     predsss = num_to_label(pred_answer)
 
     avr_total = avr_total.tolist()
-    test_file = pd.read_csv("./dataset/test/test_data.csv")
+    test_file = config["data"]["test_file_path"]
     test_ids = test_file["id"].tolist()
     output = pd.DataFrame(
         {"id": test_ids, "pred_label": predsss, "probs": avr_total},
@@ -230,6 +230,5 @@ def main():
         config = yaml.load(f)
     
     inference_concat(config) 
-
-    # inference_ib()
+    inference_ib(config)
 
