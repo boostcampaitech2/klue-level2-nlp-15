@@ -16,7 +16,6 @@ def num_to_label(label):
     return origin_label
 
 
-
 def inference_for_ib(model, test_features, device):
     dataloader = DataLoader(test_features, batch_size=16, shuffle=False, collate_fn = collate_fn)
     model.eval()
@@ -38,13 +37,12 @@ def inference_for_ib(model, test_features, device):
         output_prob.append(prob)
     return np.concatenate(output_pred).tolist(), np.concatenate(output_prob, axis=0).tolist()
 
-def load_test_dataset(dataset_dir, tokenizer):
+def load_test_dataset_for_ib(dataset_dir, tokenizer):
     test_dataset = load_data(dataset_dir)
     test_features = processor(tokenizer, test_dataset, train_mode=False)
     return test_dataset['id'], test_features
 
-
-def inference_ib(model_number):
+def inference_ib():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     Tokenizer_NAME = "klue/roberta-large"
     tokenizer = AutoTokenizer.from_pretrained(Tokenizer_NAME)
@@ -54,11 +52,11 @@ def inference_ib(model_number):
         model.parameters
         model.to(device)
         test_dataset_dir = "./dataset/test/test_data.csv"
-        test_id, test_features = load_test_dataset(test_dataset_dir, tokenizer)
+        test_id, test_features = load_test_dataset_for_ib(test_dataset_dir, tokenizer)
         pred_answer, output_prob = inference_for_ib(model, test_features, device)
         pred_answer = num_to_label(pred_answer)
         output = pd.DataFrame({'id': test_id, 'pred_label': pred_answer, 'probs': output_prob, })
-        output.to_csv(f'./prediction/to_ensemble/output_p{model_number}.csv', index=False)
+        output.to_csv(f'./prediction/to_ensemble/output_p{fold_num}.csv', index=False)
     print('---- Finished making result files for each fold! ----')
 
     files = os.listdir('./prediction/to_ensemble')
@@ -83,3 +81,9 @@ def inference_ib(model_number):
     output = pd.DataFrame({"id": test_ids, "pred_label": predsss, "probs": avr_total}, )
     output.to_csv("./prediction/final_submission.csv", index=False)
     print('---- Finished creating Final ensembled file for all folds! ----')
+
+
+
+
+def main():
+    inference_ib()
