@@ -507,3 +507,92 @@ class RBERT_Dataset(Dataset):
 
 
 ###############################################################################
+
+def pull_out_dictionary(df_input: pd.DataFrame):
+    """ pull out str `{}` values from the pandas dataframe and shape it as a new column"""
+
+    df = df_input.copy()
+
+    # assign subject_entity and object_entity column values type as dictionary
+    df['subject_entity'] = df['subject_entity'].apply(lambda x: eval(x))
+    df['object_entity'] = df['object_entity'].apply(lambda x: eval(x))
+
+    # parse item inside of subject_entity and object_entity's dictionary values as columns of dataframe
+    # word, start_idx, end_idx, type as new columns
+    df = df.assign(
+        # subject_entity
+        subject_word=lambda x: x['subject_entity'].apply(lambda x: x['word']),
+        subject_start_idx=lambda x: x['subject_entity'].apply(lambda x: x['start_idx']),
+        subject_end_idx=lambda x: x['subject_entity'].apply(lambda x: x['end_idx']),
+        subject_type=lambda x: x['subject_entity'].apply(lambda x: x['type']),
+
+        # object_entity
+        object_word=lambda x: x['object_entity'].apply(lambda x: x['word']),
+        object_start_idx=lambda x: x['object_entity'].apply(lambda x: x['start_idx']),
+        object_end_idx=lambda x: x['object_entity'].apply(lambda x: x['end_idx']),
+        object_type=lambda x: x['object_entity'].apply(lambda x: x['type']),
+    )
+
+    # drop subject_entity and object_entity column
+    df = df.drop(['subject_entity', 'object_entity'], axis=1)
+
+    return df
+
+
+class RE_Dataset_concat(torch.utils.data.Dataset):
+    """ Dataset 구성을 위한 class."""
+
+    def __init__(self, pair_dataset, labels):
+        self.pair_dataset = pair_dataset
+        self.labels = labels
+
+    def __getitem__(self, idx):
+        item = {key: val[idx].clone().detach() for key, val in self.pair_dataset.items()}
+        item['labels'] = torch.tensor(self.labels[idx])
+        return item
+
+    def __len__(self):
+        return len(self.labels)
+
+
+def preprocessing_dataset_concat(dataset):
+    """ 처음 불러온 csv 파일을 원하는 형태의 DataFrame으로 변경 시켜줍니다."""
+
+    dataset = pull_out_dictionary(dataset)
+
+    # rename columns subject_word as subject_entity, object_word as object_entity
+    dataset = dataset.rename(columns={'subject_word': 'subject_entity', 'object_word': 'object_entity'})
+
+    out_dataset = pd.DataFrame(
+        {'id': dataset['id'], 'sentence': dataset['sentence'], 'subject_entity': dataset['subject_entity'],
+         'object_entity': dataset['object_entity'], 'label': dataset['label'], })
+    return out_dataset
+
+
+def load_data_concat(dataset_dir):
+    """ csv 파일을 경로에 맡게 불러 옵니다. """
+    pd_dataset = pd.read_csv(dataset_dir)
+    dataset = preprocessing_dataset_concat(pd_dataset)
+
+    return dataset
+
+
+def tokenized_dataset_concat(dataset, tokenizer,max_token_length):
+    """ tokenizer에 따라 sentence를 tokenizing 합니다."""
+    concat_entity = []
+    for e01, e02 in zip(dataset['subject_entity'], dataset['object_entity']):
+        temp = ''
+        temp = e01 + '[SEP]' + e02
+        concat_entity.append(temp)
+    tokenized_sentences = tokenizer(
+        concat_entity,
+        list(dataset['sentence']),
+        return_tensors="pt",
+        padding='max_length',
+        truncation=True,
+        max_length=max_token_length + 4,
+        add_special_tokens=True,
+        return_token_type_ids=False,
+    )
+    return tokenized_sentences
+
