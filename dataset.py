@@ -159,7 +159,7 @@ def collate_fn(batch):
 
 def label_to_num(label):
     num_label = []
-    with open("./code/dict_label_to_num.pkl", "rb") as f:
+    with open("data/dict_label_to_num.pkl", "rb") as f:
         dict_label_to_num = pickle.load(f)
     for v in label:
         num_label.append(dict_label_to_num[v])
@@ -380,30 +380,6 @@ class EntityRelationDataset(torch.utils.data.Dataset):
 
 
 ###############################################################################
-
-
-def label_to_num(label=None):
-    num_label = []
-    with open(os.path.join(BASELINE_DIR, "dict_label_to_num.pkl"), "rb") as f:
-        dict_label_to_num = pickle.load(f)
-    for v in label:
-        num_label.append(dict_label_to_num[v])
-
-    return num_label
-
-
-def num_to_label(label):
-    """
-    숫자로 되어 있던 class를 원본 문자열 라벨로 변환 합니다.
-    """
-    origin_label = []
-    with open(os.path.join(BASELINE_DIR, "dict_num_to_label.pkl"), "rb") as f:
-        dict_num_to_label = pickle.load(f)
-    for v in label:
-        origin_label.append(dict_num_to_label[v])
-
-    return origin_label
-
 
 class RBERT_Dataset(Dataset):
     def __init__(self, dataset, tokenizer, is_training: bool = True):
