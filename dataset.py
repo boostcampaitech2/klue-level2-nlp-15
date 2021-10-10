@@ -13,12 +13,12 @@ from sklearn.model_selection import StratifiedKFold
 
 # import torch and its applications
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader, Dataset, Subset
 
 # import from huggingface transformers
 from transformers import AutoTokenizer, AutoModelForMaskedLM
 
-
+###############################################################################
 def preprocessing_dataset(dataset):
     """처음 불러온 csv 파일을 원하는 형태의 DataFrame으로 변경 시켜줍니다."""
     subject_entity = []
@@ -379,6 +379,32 @@ class EntityRelationDataset(torch.utils.data.Dataset):
         return item
 
 
+###############################################################################
+
+
+def label_to_num(label=None):
+    num_label = []
+    with open(os.path.join(BASELINE_DIR, "dict_label_to_num.pkl"), "rb") as f:
+        dict_label_to_num = pickle.load(f)
+    for v in label:
+        num_label.append(dict_label_to_num[v])
+
+    return num_label
+
+
+def num_to_label(label):
+    """
+    숫자로 되어 있던 class를 원본 문자열 라벨로 변환 합니다.
+    """
+    origin_label = []
+    with open(os.path.join(BASELINE_DIR, "dict_num_to_label.pkl"), "rb") as f:
+        dict_num_to_label = pickle.load(f)
+    for v in label:
+        origin_label.append(dict_num_to_label[v])
+
+    return origin_label
+
+
 class RBERT_Dataset(Dataset):
     def __init__(self, dataset, tokenizer, is_training: bool = True):
 
@@ -406,7 +432,7 @@ class RBERT_Dataset(Dataset):
         concat_entity = subject_entity + "[SEP]" + object_entity
 
         # tokenize
-        item = tokenizer(
+        item = self.tokenizer(
             concat_entity,
             sentence,
             return_tensors="pt",
@@ -478,3 +504,6 @@ class RBERT_Dataset(Dataset):
         # print(object_entity_mask)
 
         return subject_entity_mask, object_entity_mask
+
+
+###############################################################################
