@@ -31,7 +31,7 @@ CONCAT_CFG = SAVED_CFG["Concat"]
 
 def num_to_label(label):
     origin_label = []
-    with open("./code/dict_label_to_num.pkl", "rb") as f:
+    with open("data/dict_label_to_num.pkl", "rb") as f:
         dict_num_to_label = pickle.load(f)
     new_dict = {value: key for key, value in dict_num_to_label.items()}
     for v in label:
