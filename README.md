@@ -1,146 +1,226 @@
-[klue-level2-nlp-15](https://github.com/boostcampaitech2/klue-level2-nlp-15)
+# 문장 내 개체간 관계 추출
+[TOC]
 
-**dev branch에서 추가 & 개선할 점**
+## Hardware
+- `GPU : Tesla V100 32GB`
 
-- [x] entity_1, entity_2, [CLS]에서 hidden state vector을 뽑아내서 concat하기  -> 세현
+## Project Description
+>문장 속에서 단어간에 관계성을 파악하는 것은 의미나 의도를 해석함에 있어서 많은 도움을 줍니다. 요약된 정보를 사용해 QA 시스템 구축과 활용이 가능하며, 이외에도 요약된 언어 정보를 바탕으로 효율적인 시스템 및 서비스 구성이 가능합니다.
+>관계 추출(Relation Extraction)은 문장의 단어(Entity)에 대한 속성과 관계를 예측하는 문제입니다. 관계 추출은 지식 그래프 구축을 위한 핵심 구성 요소로, 구조화된 검색, 감정 분석, 질문 답변하기, 요약과 같은 자연어처리 응용 프로그램에서 중요합니다. 비구조적인 자연어 문장에서 구조적인 triple을 추출해 정보를 요약하고, 중요한 성분을 핵심적으로 파악할 수 있습니다.
+>이번 대회에서는 문장, 단어에 대한 정보를 통해 ,문장 속에서 단어 사이의 관계를 추론하는 모델을 학습시킵니다. 이를 통해 우리의 인공지능 모델이 단어들의 속성과 관계를 파악하며 개념을 학습할 수 있습니다. 우리의 model이 정말 언어를 잘 이해하고 있는 지, 평가해 보도록 합니다.
 
-  - [ ] entity는 "#", "@"로 감싸는 작업 수행: [Improved Baseline](https://arxiv.org/pdf/2102.01373.pdf) -> 현수,영진
+```
+sentence: 오라클(구 썬 마이크로시스템즈)에서 제공하는 자바 가상 머신 말고도 각 운영 체제 개발사가 제공하는 자바 가상 머신 및 오픈소스로 개발된 구형 버전의 온전한 자바 VM도 있으며, GNU의 GCJ나 아파치 소프트웨어 재단(ASF: Apache Software Foundation)의 하모니(Harmony)와 같은 아직은 완전하지 않지만 지속적인 오픈 소스 자바 가상 머신도 존재한다.
+subject_entity: 썬 마이크로시스템즈
+object_entity: 오라클
 
-- [ ] **Bidirectional RNN을 backbone 뒤에다가 붙여보기** 
+relation: 단체:별칭 (org:alternate_names)
+```
 
-  ```python
-  class RoBERTa(torch.nn.Module):
-      def __init__(self):
-          super().__init__()
-          self.MODEL_NAME = 'klue/roberta-large'
-          self.bert_model = AutoModel.from_pretrained(self.MODEL_NAME)
-          self.hidden_size = 1024
-          self.num_labels = 30
-          self.tokenizer = AutoTokenizer.from_pretrained(self.MODEL_NAME)
-          
-          special_tokens_dict = {
-              'additional_special_tokens':[
-                  '[SUB:ORG]',
-                  '[SUB:PER]',
-                  '[/SUB]',
-                  '[OBJ:DAT]',
-                  '[OBJ:LOC]',
-                  '[OBJ:NOH]',
-                  '[OBJ:ORG]',
-                  '[OBJ:PER]',
-                  '[OBJ:POH]',
-                  '[/OBJ]'
-              ]
-          }
-  
-          num_added_tokens = self.tokenizer.add_special_tokens(special_tokens_dict)
-          print("num_added_tokens:",num_added_tokens)
-  
-          self.bert_model.resize_token_embeddings(len(self.tokenizer))
-          
-          self.lstm = torch.nn.LSTM(input_size=~~~, hidden_size = ~~~,bidirectional=True)
-          
-          # classifier은 바꾸지 않고
-          self.classifier = torch.nn.Sequential(
-              torch.nn.Linear(3*self.hidden_size,self.hidden_size),
-              torch.nn.Dropout(p=0.1, inplace=False),
-              torch.nn.Linear(self.hidden_size,self.num_labels)
-          )
-    def forward(self,item):
-      input_ids = item['input_ids']
-      token_type_ids = item['token_type_ids']
-      attention_mask = item['attention_mask']
-      sub_token_index = item['sub_token_index']
-      obj_token_index = item['obj_token_index']
-      out = self.bert_model(input_ids=input_ids,token_type_ids=token_type_ids,attention_mask=attention_mask)
-      h = out.last_hidden_state
-      # output, _ = lstm(h,bidirectional=True)
-      batch_size = h.shape[0]
-  
-  ```
+## 평가 방법
+KLUE-RE evaluation metric을 그대로 재현했습니다.
 
-  RBERT에서 나온 token이 문장 길이 10이었으면 10개가 있는데, 그걸 하나씩 넣으면서 10개 token에 대해서 sequence처리를 해야 할 것 같아요.
+1) no_relation class를 제외한 **micro F1 score**
+2) 모든 class에 대한 **area under the precision-recall curve (AUPRC)**
+- 2가지 metric으로 평가하며, **micro F1 score**가 우선시 됩니다.
 
-- [ ] Dropout(p=0)으로 Dropout 제거
+Micro F1 score
+- micro-precision과 micro-recall의 조화 평균이며, 각 샘플에 동일한 importance를 부여해, 샘플이 많은 클래스에 더 많은 가중치를 부여합니다. 데이터 분포상 많은 부분을 차지하고 있는 no_relation class는 제외하고 F1 score가 계산 됩니다.
 
-- [ ] AdamP 사용하고 싶다.
+AUPRC
+- x축은 Recall, y축은 Precision이며, 모든 class에 대한 평균적인 AUPRC로 계산해 score를 측정 합니다. imbalance한 데이터에 유용한 metric 입니다
 
-- [ ] 현재 max_token_len = 256 -> collate_fn 만들어서 batch마다 max length 정해서 125보다 더 작은 length인 경우에는 더 짧게 해서 학습시키려고 했습니다 -> max_length를 구해서 하면 버리는 데이터도 없고 좋을것같아요 아예 데이터셋에서 batch를 묶어줄 때, 비슷한 token 개수(length)인 것들을 모아서 뽑는 방식도 있더라고요! 이걸 uniform length batching이라고 하는 것 같습니다. 어제 성욱님이 token length distribution이 class 별로도 유사하다는 걸 보여주신 덕분에 uniform length batching도 걱정없이 쓸 수 있을 것 같습니다 -> 영진
+## Dataset
+- dataset 설명
+```
+data
+|    +- train_pororo_sub.csv
+|    +- test_pororo_sub.csv
+|    +- train.csv
+|    +- test.csv
+```
+    - 'train_pororo_sub.csv'를 활용하여 `RBERT`, `KLUE/RoBERTa-large` 학습을 진행한다.
+    - 'test_pororo_sub.csv'를 활용하여 `RBERT`, `KLUE/RoBERTa-large` 모델을 바탕으로 'submission.csv' 파일을 생성한다.
+    - 'train.csv'를 활용하여 `RE Improved Baseline` 학습을 진행한다.
+    - 'test.csv'를 활용하여 `RE Improved Baseline` 모델을 바탕으로 'submission.csv' 파일을 생성한다.
 
-- [ ] Train set 전체를 입력하고 Random Mask (prob=0.1) 씌워서 Pretrain을 하고 싶다. 나만의 작은 KLUE-BERT만들기 -> 준홍, 재영, 영진 🤗
+- Dataset 통계
+    - train dataset : 총 32470개
+    - test dataset : 7765개 (label은 전부 100으로 처리되어 있습니다.)
+- Data 예시 (`train.csv`)
+    - `id`, `sentence`, `subject_entity`, `object_entity`, `label`, `source`로 구성된 csv 파일
+    - `sentence example` : <Something>는 조지 해리슨이 쓰고 비틀즈가 1969년 앨범 《Abbey Road》에 담은 노래다. (문장)
+    - `subject_entity example` : {'word': '조지 해리슨', 'start_idx': 13, 'end_idx': 18, 'type': 'PER'} (단어, 시작 idx, 끝 idx, 타입)
+    - `object_entity example` : {'word': '비틀즈', 'start_idx': 24, 'end_idx': 26, 'type': 'ORG'} (단어, 시작 idx, 끝 idx, 타입)
+    - `label example` : no_relation (관계),
+    - `source example` : wikipedia (출처)
+- Relation class에 대한 정보는 다음과 같습니다. 
+![1](https://user-images.githubusercontent.com/53552847/136692171-30942eec-fb83-4175-aa8d-13559ae2caf1.PNG)
 
-  - [ ] 실험할 때는 가벼운 걸(klue/bert-base)로 실험하고, 무거운 거(xlm-roberta-large, klue/roberta-large)로 pretrain시키기
-  - [ ] ~~Train set하고 validation set하고 나눠서 Validation해야 의미가 있는 듯... (지금은 일단 validation으로 나눠놓는다) 근데 정답 주고 학습하는 건 아니니까 좀 애매... train함수 안에 MLM train할 생각이었는데. Train vs Val을 나눠놓은 다음에 그걸 train set에 MLM에 사용하고, MLM이 끝나면, finetuning을 할 생각이었음. random seed만 통일시켜놓는 것~~
+## code
+#### 디렉토리 구조
+```
+│  .gitignore
+│  ensemble.py
+│  inference.py
+│  main.py
+│  models.py
+│  README.md
+│  requirements.txt
+│  train.py
+│
+├─data
+│      dict_label_to_num.pkl
+│      dict_num_to_label.pkl
+│      eng_pororo_special_token.txt
+│      pororo_special_token.txt
+│      test_pororo_sub.csv
+│      test_punct_kor.csv
+│      test_typed_entity_marker_punct.csv
+│      train_pororo_sub.csv
+│      train_punct_kor.csv
+│      train_typed_entity_marker_punct.csv
+│      wordnet.pickle
+│
+├─dataset
+│      ib_dataset.py
+│      stc_dataset.py
+│
+├─notebooks
+│      RE_improved_baseline.ipynb
+│      roberta_with_lstm.ipynb
+│      tmp_sub.ipynb
+│      train_with_pororo.ipynb
+│
+├─notes
+│      config.md
+│      dataset.md
+│      loss.md
+│      models.md
+│      optimizer.md
+│      trainer.md
+│
+└─utils
+        loss.py
+        metrics.py
+```
+- `train.py`
+    - code를 학습시키기 위한 파일입니다.
+    - 저장된 model관련 파일은 `results` 폴더에 있습니다.
 
-- [ ] Pororo에서 NER로 표기한 42개 추가하기 
+- `inference.py`
+    - 학습된 model을 통해 prediction하며, 예측한 결과를 csv 파일로 저장해줍니다.
+    - 저장된 파일은 prediction 폴더에 있습니다.
 
-  ```python
-  # models.py
-  class RoBERTa(torch.nn.Module):
-      def __init__(self):
-          super().__init__()
-          self.MODEL_NAME = 'klue/roberta-large'
-          self.bert_model = AutoModel.from_pretrained(self.MODEL_NAME)
-          self.hidden_size = 1024
-          self.num_labels = 30
-          self.tokenizer = AutoTokenizer.from_pretrained(self.MODEL_NAME)
-          
-          special_tokens_dict = {
-              'additional_special_tokens':[
-                  '[SUB:ORG]',
-                  '[SUB:PER]',
-                  '[/SUB]',
-                  '[OBJ:DAT]',
-                  '[OBJ:LOC]',
-                  '[OBJ:NOH]',
-                  '[OBJ:ORG]',
-                  '[OBJ:PER]',
-                  '[OBJ:POH]',
-                  '[/OBJ]'
-              ]
-          }
-  
-  # dataset.py에서 sub_type 부분을 바꾸면 됨
-  def add_entity_token(data):
-    """index로 하는 이유가 있다고!"""
-      sub_start_idx, sub_end_idx = data.subject_entity['start_idx'], data.subject_entity['end_idx']
-      obj_start_idx, obj_end_idx = data.object_entity['start_idx'], data.object_entity['end_idx']
-      
-      sub_type = data.subject_entity['type']
-      obj_type = data.object_entity['type']
-      
-      s = data.sentence
-      
-      if sub_start_idx < obj_start_idx:
-          res = [
-              s[:sub_start_idx],
-              f"[SUB:{sub_type}]" + s[sub_start_idx:sub_end_idx+1] + "[/SUB]",
-              s[sub_end_idx+1:obj_start_idx],
-              f"[OBJ:{obj_type}]" + s[obj_start_idx:obj_end_idx+1] + "[/OBJ]",
-              s[obj_end_idx+1:]
-          ]
-      else:
-          res = [
-              s[:obj_start_idx],
-              f"[OBJ:{obj_type}]" + s[obj_start_idx:obj_end_idx+1] + "[/OBJ]",
-              s[obj_end_idx+1:sub_start_idx],
-              f"[SUB:{sub_type}]" + s[sub_start_idx:sub_end_idx+1] + "[/SUB]",
-              s[sub_end_idx+1:]
-          ]
-      
-      return ''.join(res)    
-  
-  ```
+- `load_data.py`
+    - baseline code의 전처리와 데이터셋 구성을 위한 함수들이 있는 코드입니다.
 
-- [ ] [Stratified K-Fold 추가: 참고 사항](https://github.com/boostcampaitech2/klue-level2-nlp-15/blob/main/train_with_pororo.ipynb)
+- `logs`
+    - 텐서보드 로그가 담기는 폴더 입니다.
 
----
+- `prediction`
+    - `inference.py` 를 통해 model이 예측한 정답 `submission.csv` 파일이 저장되는 폴더 입니다.
 
-- [x] ~~Multitask Classification을 구현하고 싶다. (Duo classifier)~~
-- [x] ~~KoElectra as backbone model~~
+- `results`
+    - `train.py`를 통해 설정된 step 마다 model이 저장되는 폴더 입니다.
 
-- [x] Data Augmentation
-  - [x] KoEDA - Random Switching, 동의어 바꾸기 -> CSV로 공유해주시면 좋을 것 같음다 ㅎㅎㅎ
-  - [x] pororo를 이용해서 round trip translation을 하고 싶다 -> 영진
-  
-  
+- `best_model `
+    - 학습중 evaluation이 best인 model이 저장 됩니다.
+
+- `dict_label_to_num.pkl`
+    - 문자로 되어 있는 label을 숫자로 변환 시킬 dictionary 정보가 저장되어 있습니다.
+
+- `dict_num_to_label.pkl`
+    - 숫자로 되어 있는 label을 원본 문자로 변환 시킬 dictionary 정보가 저장되어 있습니다.
+
+
+## Implementation
+In Terminal
+
+- Install Requirements
+```python
+pip install -r requirements.txt
+```
+- training
+```
+python train.py
+```
+
+- inference
+```
+python inference.py
+```
+
+## Arguments Usage
+- RBERT
+
+|Argument|type|Default|Explanation|
+|---|---|---|---|
+|batch_size|int|40|학습&예측에 사용될 batch size|
+|num_folds|int|5|Stratified KFold의 fold 개수|
+|num_train_epochs|int|5|학습 epoch|
+|loss|str|focalloss|loss function|
+|gamma|float|1.0|focalloss 사용시 gamma 값|
+|optimizer|str|adamp|학습 optimizer|
+|scheduler|str|get_cosine_schedule_with_warmup|learning rate를 조절하는 scheduler|
+|learning_rate|float|0.00005|초기 learning rate 값|
+|weight_decay|float|0.01|Loss function에 Weigth가 커질 경우 패널티 값|
+|warmup_step|int|500|
+|debug|bool|false|디버그 모드일 경우 True|
+|dropout_rate|float|0.1|dropout 비율|
+|save_steps|int|100|모델 저장 step 수|
+|evaluation_steps|int|100|evaluation할 step 수|
+|metric_for_best_model|str|eval/loss|최고 성능을 가늠하는 metric|
+|load_best_model_at_end|bool|True|
+
+- RE Improved Baseline
+
+|Argument|type|Default|
+|---|---|---|
+|batch_size|int|16|
+|num_folds|int|5|
+|num_train_epochs|int|5|
+|loss|str|focalloss|
+|gamma|float|1.0|
+|optimizer|str|adamp|
+|scheduler|str|get_cosine_schedule_with_warmup|
+|learning_rate|float|0.00005|
+|weight_decay|float|0.01|
+|gradient_accumulation_steps|int|2|
+|max_grad_norm|float|1.0|
+|warmup_ratio|float|0.1|
+|warmup_step|int|500|
+|debug|bool|false|
+|dropout_rate|float|0.1|
+|save_steps|int|100|
+|evaluation_steps|int|100|
+|metric_for_best_model|str|f1|
+|load_best_model_at_end|bool|True|
+
+- Concat Model
+
+|Argument|type|Default|
+|---|---|---|
+|model|str|CustomModel|
+|num_labels|int|30|
+|num_workers|int|4|
+|max_token_length|int|132|
+|stopwords|list|[]|
+|pretrained_model_name|str|klue/roberta-large|
+|fine_tuning_method|str|concat|
+|batch_size|int|40|
+|num_folds|int|5|
+|num_train_epochs|int|3|
+|loss|str|focalloss|
+|gamma|int|0.5|
+|optimizer|str|adamp|
+|learning_rate|float|0.00005|
+|weight_decay|float|0.01|
+|warmup_steps|int|300|
+|debug|bool|false|
+|dropout_rate|float|0.1|
+|save_steps|int|100|
+|evaluation_strategy|str|steps|
+|evaluation_steps|int|500|
+|metric_for_best_model|str|accuracy|
+|load_best_model_at_end|bool|true|
