@@ -1,16 +1,16 @@
 IB:
   # path and directory definition
-  root_path: "./"
-  root_data_path: "./data"
-  train_file_path: "./data/train.csv"
-  test_file_path: "./data/test_data.csv"
-  prediction_data_path: "./result"
-  label_to_num_file_path: "./data/dict_label_to_num.pkl"
-  num_to_label_file_path: "./data/dict_num_to_label.pkl"
-  pororo_train_path: "./data/train_pororo_sub.csv"
-  pororo_test_path: "./data/test_pororo_sub.csv"
-  pororo_special_token_path: "./data/pororo_special_token.txt"
-  saved_model_dir: "./result"
+  root_path: ./
+  root_data_path: ./data
+  train_file_path: ./data/train.csv
+  test_file_path: ./data/test_data.csv
+  prediction_data_path: ./result
+  label_to_num_file_path: ./data/dict_label_to_num.pkl
+  num_to_label_file_path: ./data/dict_num_to_label.pkl
+  pororo_train_path: ./data/train_pororo_sub.csv
+  pororo_test_path: ./data/test_pororo_sub.csv
+  pororo_special_token_path: ./data/pororo_special_token.txt
+  saved_model_dir: ./result
 
   # wandb configuration
   user_name: happyface
