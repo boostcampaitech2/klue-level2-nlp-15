@@ -79,7 +79,7 @@ def inference_ib():
     test_file = pd.read_csv("./dataset/test/test_data.csv")
     test_ids = test_file['id'].tolist()
     output = pd.DataFrame({"id": test_ids, "pred_label": predsss, "probs": avr_total}, )
-    output.to_csv("./prediction/final_submission.csv", index=False)
+    output.to_csv("./prediction/ib_output.csv", index=False)
     print('---- Finished creating Final ensembled file for all folds! ----')
 
 
