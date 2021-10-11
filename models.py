@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.cuda.amp import autocast
 import torch.nn as nn
-from transformers import AutoModel, AutoConfig
+from transformers import AutoModel, AutoConfig, AutoTokenizer
 from utils.loss import FocalLoss
 
 
