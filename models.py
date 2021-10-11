@@ -10,7 +10,7 @@ class IBModel(nn.Module):
     """
     Model implementation of paper: 'An Improved Baseline for Sentence-level Relation Extraction'
     with some customizations added to match the performance on KLUE RE task
-    https://arxiv.org/abs/2102.01373
+    https://arxiv.org/abs/2102.01373 | https://github.com/wzhouad/RE_improved_baseline/blob/main/model.py
     """
 
     def __init__(self, model_name, config):
@@ -116,6 +116,8 @@ class StartTokenWithCLSModel(torch.nn.Module):
 
 
 class FCLayer(nn.Module):
+    """R-BERT: https://github.com/monologg/R-BERT/blob/master/model.py"""
+
     def __init__(self, input_dim, output_dim, dropout_rate=0.0, use_activation=True):
         super(FCLayer, self).__init__()
         self.use_activation = use_activation
@@ -131,7 +133,7 @@ class FCLayer(nn.Module):
 
 
 class RBERT(nn.Module):
-    """R-BERT: https://github.com/monologg/R-BERT"""
+    """R-BERT: https://github.com/monologg/R-BERT/blob/master/model.py"""
 
     def __init__(
         self,
