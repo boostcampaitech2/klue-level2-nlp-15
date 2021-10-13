@@ -453,8 +453,8 @@ class RBERT_Dataset(Dataset):
         subject_entity_mask, object_entity_mask = self.add_entity_mask(
             item, subject_entity, object_entity
         )
-        item["subject_mask"] = torch.Tensor(subject_entity_mask)
-        item["object_mask"] = torch.Tensor(object_entity_mask)
+        item["subject_mask"] = subject_entity_mask
+        item["object_mask"] = object_entity_mask
 
         # fill label
         item["label"] = label
@@ -505,7 +505,7 @@ class RBERT_Dataset(Dataset):
         # print(subject_entity_mask)
         # print(object_entity_mask)
 
-        return subject_entity_mask, object_entity_mask
+        return torch.Tensor(subject_entity_mask), torch.Tensor(object_entity_mask)
 
 
 ###############################################################################
