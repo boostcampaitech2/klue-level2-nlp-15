@@ -146,15 +146,16 @@ class RBERT(nn.Module):
         super(RBERT, self).__init__()
 
         self.model_name = model_name
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         config = AutoConfig.from_pretrained(model_name)
-        config.num_labels = num_labels
         self.backbone_model = AutoModel.from_pretrained(model_name, config=config)
         self.dropout_rate = dropout_rate
         self.num_labels = num_labels
+        config.num_labels = num_labels
 
         # add special tokens
         self.special_tokens_dict = special_tokens_dict
-        self.backbone_model.resize_token_embeddings(len(tokenizer))
+        self.backbone_model.resize_token_embeddings(len(self.tokenizer))
 
         self.cls_fc_layer = FCLayer(
             config.hidden_size, config.hidden_size, self.dropout_rate
